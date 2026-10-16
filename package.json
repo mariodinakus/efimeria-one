@@ -1,0 +1,9 @@
+{
+  "name": "efimeria-one",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Greece-first emergency facility finder with official duty sources",
+  "scripts": { "dev": "node dev-server.mjs", "check": "node --check src/app.js && node --check api/nearby.js && node --check api/places.js && node --check dev-server.mjs" },
+  "engines": { "node": ">=20" }
+}
