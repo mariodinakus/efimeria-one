@@ -1,18 +1,22 @@
-/** City/town geocoding: bounded to Greece; no storage of personal coordinates. */
-const send=(res,status,data)=>{res.statusCode=status;res.setHeader('Content-Type','application/json; charset=utf-8');res.setHeader('Cache-Control',status===200?'public, s-maxage=86400':'no-store');res.end(JSON.stringify(data));};
+/** Bilingual Greek place search (geocoding is not a verified healthcare service). */
+const send=(res,status,data)=>{res.statusCode=status;res.setHeader('Content-Type','application/json; charset=utf-8');res.setHeader('Cache-Control',status===200?'public, s-maxage=3600, stale-while-revalidate=86400':'no-store');res.end(JSON.stringify(data));};
 export default async function handler(req,res){
  if(req.method!=='GET')return send(res,405,{error:'Method not allowed'});
- const q=String(req.query.q||'').trim().slice(0,80);
- const lang='en'; // Public Photon demo may not expose Greek-localized names; Greek input still works.
+ const q=String(req.query.q||'').trim().slice(0,90);
+ const lang=req.query.lang==='el'?'el':'en';
  if(q.length<2||!/^[\p{L}\p{M}\s'.,-]+$/u.test(q))return send(res,400,{error:'Invalid location query'});
- const c=new AbortController(), timer=setTimeout(()=>c.abort(),6500);
+ const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),7800);
  try{
-  const url='https://photon.komoot.io/api/?'+new URLSearchParams({q:q+', Greece',limit:'8',lang});
-  const r=await fetch(url,{signal:c.signal,headers:{'Accept':'application/json'}});
-  if(!r.ok)throw new Error('Location service unavailable');
-  const p=await r.json();
-  const places=(p.features||[]).filter(x=>x.properties?.countrycode==='GR'||x.properties?.country==='Greece'||x.properties?.country==='Ελλάδα').map(x=>({label:[x.properties.name,x.properties.city,x.properties.state].filter((v,i,a)=>v&&a.indexOf(v)===i).join(', '),lat:x.geometry.coordinates[1],lon:x.geometry.coordinates[0]})).slice(0,6);
+  // Restrict at the API, rather than appending ', Greece' to a local neighborhood name.
+  const url='https://photon.komoot.io/api/?'+new URLSearchParams({q,limit:'14',lang:lang==='el'?'en':lang,countrycode:'GR',bbox:'19.3,34.5,29.8,41.9'});
+  const r=await fetch(url,{signal:controller.signal,headers:{Accept:'application/json'}});
+  if(!r.ok)throw Error('Geocoding unavailable');
+  const data=await r.json();
+  const places=(data.features||[]).filter(f=>f.properties?.countrycode==='GR')
+   .filter(f=>Array.isArray(f.geometry?.coordinates)&&f.geometry.coordinates.length>=2)
+   .map(f=>{const p=f.properties;return {label:[p.name,p.district,p.city,p.state].filter((v,i,a)=>v&&a.indexOf(v)===i).join(', '),lat:f.geometry.coordinates[1],lon:f.geometry.coordinates[0],priority:p.osm_key==='place'?0:p.osm_key==='boundary'?1:2}})
+   .filter(p=>Number.isFinite(p.lat)&&Number.isFinite(p.lon))
+   .sort((a,b)=>a.priority-b.priority).slice(0,8).map(({priority,...p})=>p);
   return send(res,200,{places});
- }catch{ return send(res,503,{error:'Location search temporarily unavailable'});}
- finally{clearTimeout(timer);}
+ }catch{return send(res,503,{error:'Location search temporarily unavailable'});}finally{clearTimeout(timer)}
 }

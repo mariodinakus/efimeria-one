@@ -51,3 +51,11 @@ npm run dev
 No login, advertising or location history collected by the app. Browser GPS requires permission. Coordinates are forwarded to Vercel Functions and external Overpass providers, and map providers may receive network metadata. Hosting and infrastructure providers may keep their own logs. All third-party services have independent availability, accuracy, quotas and usage terms.
 
 **Emergency UI is informational only. EFIMERIA ONE is not affiliated with Greek authorities or emergency services.**
+
+## Fixes in v2.1 (October 2026)
+
+- Removed deprecated no-key CARTO basemap (CARTO requires an API key). Uses the standard OSM tile URL with attribution; intended only for normal interactive map viewing under the [OSM tile usage policy](https://operations.osmfoundation.org/policies/tiles/). This community tile server is best-effort, not an SLA-backed provider for high-traffic production.
+- Map now automatically invalidates its size on layout changes, uses a CDNs fallback for Leaflet, exposes a map GPS button, and removes the obsolete loading overlay.
+- Position fixes use device geolocation after user approval, display reported accuracy with a circle, and try approximate reverse locality naming without moving the GPS pin. If access is denied, enable device/browser location permissions; websites cannot override them.
+- Text search now selects a matching Greek location when submitted rather than merely presenting autocomplete; Photon requests are explicitly bounded to Greece. Photon public API is best-effort and rate-limited.
+- Live official on-duty status is still **not** verified by the map; contact the official source or call 112/166 in emergencies.
