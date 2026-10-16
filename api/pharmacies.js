@@ -7,7 +7,10 @@ const PAGES={
  athens:'/efimereyonta-farmakeia/athina/athhna',
  kordelio:'/efimereyonta-farmakeia/thessaloniki/eleftherio-kordelio',
  evosmos:'/efimereyonta-farmakeia/thessaloniki/eyosmos',
- kalamaria:'/efimereyonta-farmakeia/thessaloniki/kalamaria'
+ kalamaria:'/efimereyonta-farmakeia/thessaloniki/kalamaria',
+ patras:'/efimereyonta-farmakeia/patra',
+ larissa:'/efimereyonta-farmakeia/larisa',
+ kavala:'/efimereyonta-farmakeia/kavala'
 };
 const MONTHS=['','ΙΑΝΟΥΑΡΙΟΥ','ΦΕΒΡΟΥΑΡΙΟΥ','ΜΑΡΤΙΟΥ','ΑΠΡΙΛΙΟΥ','ΜΑΙΟΥ','ΙΟΥΝΙΟΥ','ΙΟΥΛΙΟΥ','ΑΥΓΟΥΣΤΟΥ','ΣΕΠΤΕΜΒΡΙΟΥ','ΟΚΤΩΒΡΙΟΥ','ΝΟΕΜΒΡΙΟΥ','ΔΕΚΕΜΒΡΙΟΥ'];
 const normalize=s=>String(s||'').toLocaleUpperCase('el-GR').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' ').trim();
