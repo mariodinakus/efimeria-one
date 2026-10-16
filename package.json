@@ -6,13 +6,14 @@
   "description": "Bilingual automatic published duty roster reader for Greece",
   "scripts": {
     "dev": "node dev-server.mjs",
-    "check": "node --check api/duty.js && node --check api/pharmacies.js && node --check lib/pdf-roster.js && node --check api/places.js"
+    "check": "node --check api/duty.js && node --check api/pharmacies.js && node --check lib/pdf-roster.js && node --check api/places.js && node --check lib/thess-roster.js"
   },
   "engines": {
     "node": ">=20"
   },
   "dependencies": {
     "pdfjs-dist": "3.11.174",
-    "cheerio": "1.0.0"
+    "cheerio": "1.0.0",
+    "exceljs": "4.4.0"
   }
 }
