@@ -1,61 +1,33 @@
-# EFIMERIA ONE 🇬🇷 / EN
+# EFIMERIA ONE v3 — duty-schedule quick finder
 
-Nationwide, bilingual healthcare-location finder for Greece. Deployable static frontend and Vercel serverless functions, with **no paid API key**.
+A mobile-first, bilingual (Greek/English) **map-free** experience for finding published hospital/pharmacy duty schedules in Greece.
 
-## What is included
+## Usage
 
-- Full **Greek / English** interface toggle (top-right, choice stored in browser).
-- Nationwide city/town/village searches, Greek and Latin spelling, including Greek islands; built-in popular-city shortcuts for Athens, Thessaloniki, Patras, Heraklion, Larissa, Ioannina, Rhodes, Corfu; any other Greek location can be searched by name.
-- Consent-based geolocation, 3–30 km radius, OpenStreetMap hospital/pharmacy lookup, straight-line distance, contacts when tagged, one-tap Google Maps directions.
-- Interactive Leaflet map; responsive mobile/desktop; dark/light theme; installable PWA.
-- Medical-specialty selector **for guidance when opening the official duty schedules only** — not a verified filter or a claim that a facility is currently on duty.
-- Contextual links to the Greek Ministry of Health, 4th Regional Health Authority (Thessaloniki), Thessaloniki/Attica pharmacy associations, the national eHealth pharmacy link directory, plus links to all **seven Regional Health Authorities**.
+1. Enter an area (or grant GPS once).
+2. Set the duty date, then choose **Hospitals** or **Pharmacies**.
+3. For hospitals, optionally choose a medical specialty as a reminder; confirm that specialty in the actual published roster.
+4. Open the prioritized official roster source for that area. For Attica hospitals, the app additionally tries to find date-specific PDF/document links on the Greek Health Ministry website using /api/attica-roster.
+5. Once you have confirmed the provider in the published roster, enter the name or street address to open Google Maps directions.
 
-## Live duty data safety
+## Critical accuracy limitation
 
-**This app does NOT independently verify which hospital, emergency department, medical specialty or pharmacy is on duty at a given moment.** OpenStreetMap only lists mapped facilities and contact details, and may contain gaps or outdated locations. Links to authority schedules should be checked on the official page, matching date, specialty, place and hours. For time-sensitive severe emergencies, call **112** or **166** immediately, not the application.
+This is a **source navigation app**, **not a nationwide verified real-time duty API**. It does not provide in-app named, live verified duty providers in all Greek municipalities. The Ministry publishes hospital rotas in varying formats, often PDF, and pharmacy associations operate separate services (some requiring authorization). A listed source or map search is NOT evidence that a particular provider is on duty. Do not use unverified results in emergencies. Call **112** or **166** if urgent.
 
-The coverage is **nationwide for discovering mapped facilities and looking up locations**, not a guarantee of nationwide machine-readable live rosters. Duty schedules and authoritative information are fragmented across regions; no unified, verified per-facility API has been integrated. Do not mistake map entries for an open-now status.
+## Sources
 
-## Deploy on Vercel
+- Greek public national duty portal: https://efimeries.gov.gr/
+- Greek Ministry of Health: https://www.moh.gov.gr/articles/citizen/efhmeries-nosokomeiwn/
+- Attica daily hospital duty PDFs: https://www.moh.gov.gr/articles/citizen/efhmeries-nosokomeiwn/68-efhmeries-nosokomeiwn-attikhs
+- Thessaloniki hospital roster: https://www.4ype.gr/efimeries-nosokomeion/
+- Thessaloniki pharmacists: https://efimeries.fsth.gr/
+- Attica pharmacists: https://fsa-efimeries.gr/Home/
+- Nationwide pharmacy source directory: https://ehealthrecord.gov.gr/pharmacies
 
-1. GitHub repo: `https://github.com/mariodinakus/efimeria-one`.
-2. In Vercel click **Add New > Project > Import Git Repository** and select `efimeria-one`.
-3. Choose **Framework Preset: Other**, **Root Directory: .**. Leave the build and output directory commands blank. **Deploy**.
-4. Vercel serves root files as static assets and `api/nearby.js`, `api/places.js` as Node Functions. No API key or secrets required.
-5. Updates to `main` will trigger redeployment if the Git integration is connected.
+## Deployment
 
-## Local testing
+The root index.html is self-contained and framework-free. Vercel automatically detects /api/places.js, /api/reverse.js, and /api/attica-roster.js as serverless functions. No paid API key is required for the map-free frontend. Existing legacy map-related files remain in the repository for reference but are no longer loaded.
 
-Requires Node.js 20 or later. There are no production npm packages to install.
+## Privacy
 
-```sh
-npm run check
-npm run dev
-# localhost:3000
-```
-
-## Data sources
-
-- Hospital duty schedules: https://www.moh.gov.gr/articles/citizen/efhmeries-nosokomeiwn/
-- Thessaloniki hospital schedules: https://www.4ype.gr/efimeries-nosokomeion/
-- All 7 Regional Health Authorities: https://www.moh.gov.gr/articles/citizen/xrhsima-thlefwna-amp-dieythynseis/2719-ygeionomikes-perifereies
-- Thessaloniki pharmacy rosters: https://efimeries.fsth.gr/
-- Attica pharmacy rosters: https://fsa-efimeries.gr/Home/
-- Regional pharmacy link directory: https://ehealthrecord.gov.gr/pharmacies
-- National roster portal: https://efimeries.gov.gr/
-- OSM / Overpass for mapped healthcare facility locations, Photon for place name search, CARTO / OpenStreetMap for base map tiles.
-
-## Privacy and limitations
-
-No login, advertising or location history collected by the app. Browser GPS requires permission. Coordinates are forwarded to Vercel Functions and external Overpass providers, and map providers may receive network metadata. Hosting and infrastructure providers may keep their own logs. All third-party services have independent availability, accuracy, quotas and usage terms.
-
-**Emergency UI is informational only. EFIMERIA ONE is not affiliated with Greek authorities or emergency services.**
-
-## Fixes in v2.1 (October 2026)
-
-- Removed deprecated no-key CARTO basemap (CARTO requires an API key). Uses the standard OSM tile URL with attribution; intended only for normal interactive map viewing under the [OSM tile usage policy](https://operations.osmfoundation.org/policies/tiles/). This community tile server is best-effort, not an SLA-backed provider for high-traffic production.
-- Map now automatically invalidates its size on layout changes, uses a CDNs fallback for Leaflet, exposes a map GPS button, and removes the obsolete loading overlay.
-- Position fixes use device geolocation after user approval, display reported accuracy with a circle, and try approximate reverse locality naming without moving the GPS pin. If access is denied, enable device/browser location permissions; websites cannot override them.
-- Text search now selects a matching Greek location when submitted rather than merely presenting autocomplete; Photon requests are explicitly bounded to Greece. Photon public API is best-effort and rate-limited.
-- Live official on-duty status is still **not** verified by the map; contact the official source or call 112/166 in emergencies.
+Geolocation is opt-in. The app does not deliberately store location server-side, but location lookups use external services that may process request metadata. Prefer manual area entry if desired.
