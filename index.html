@@ -75,7 +75,7 @@ let autoRequest=0;
 function statusMessage(text,failed=false){const el=$('autoStatus');el.className=failed?'status error':'status';el.textContent=text}
 function autoLocale(gr,en){return lang==='el'?gr:en}
 function mapsURL(destination){return 'https://www.google.com/maps/dir/?api=1&destination='+encodeURIComponent(destination+', Greece')}
-function autoRegion(){if(type==='hospital')return isAthens()?'attica':isThess()?'thessaloniki':null;if(isAthens())return 'athens';if(isThess()){
+function autoRegion(){if(type==='hospital')return isAthens()?'attica':isThess()?'thessaloniki':null;if(isAthens())return 'athens';if(d(chosen.lat,chosen.lon,38.2466,21.7346)<25)return 'patras';if(d(chosen.lat,chosen.lon,39.639,22.4191)<24)return 'larissa';if(d(chosen.lat,chosen.lon,40.9369,24.4129)<22)return 'kavala';if(isThess()){
  const word=norm(label());
  if(word.includes('ΚΑΛΑΜΑΡΙΑ')||word.includes('KALAMARIA'))return 'kalamaria';
  if(word.includes('ΚΟΡΔΕΛΙΟ')||word.includes('KORDELIO'))return 'kordelio';
