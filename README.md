@@ -1,33 +1,47 @@
-# EFIMERIA ONE v3 — duty-schedule quick finder
+# EFIMERIA ONE v4 — Automatic Duty Roster Finder
 
-A mobile-first, bilingual (Greek/English) **map-free** experience for finding published hospital/pharmacy duty schedules in Greece.
+Bilingual (Greek / English), mobile-first, map-free search for **published duty schedules** with Google Maps navigation per result.
 
-## Usage
+## What's actually automated
 
-1. Enter an area (or grant GPS once).
-2. Set the duty date, then choose **Hospitals** or **Pharmacies**.
-3. For hospitals, optionally choose a medical specialty as a reminder; confirm that specialty in the actual published roster.
-4. Open the prioritized official roster source for that area. For Attica hospitals, the app additionally tries to find date-specific PDF/document links on the Greek Health Ministry website using /api/attica-roster.
-5. Once you have confirmed the provider in the published roster, enter the name or street address to open Google Maps directions.
+| Area | Type | Automatic source | Status |
+| --- | --- | --- | --- |
+| Attica | Hospitals by specialty | Ministry of Health daily PDF | Automatic retrieval and column-aware structured parsing; verified published roster, not live service |
+| Thessaloniki | Hospitals by specialty | 3rd Health District monthly XLSX | Automatic retrieval by month, matching hospital/specialty/date cells; 3rd District facilities only |
+| Thessaloniki area | Pharmacies | Independent duty listing site | Date-checked HTML extraction; *not* official or confirmed open |
+| Attica | Pharmacies | Independent duty listing site | Date-checked HTML extraction; *not* official or confirmed open |
+| Other areas | Either | No connected verified source yet | Clearly marked unavailable; never invented results |
 
-## Critical accuracy limitation
+## How it works
 
-This is a **source navigation app**, **not a nationwide verified real-time duty API**. It does not provide in-app named, live verified duty providers in all Greek municipalities. The Ministry publishes hospital rotas in varying formats, often PDF, and pharmacy associations operate separate services (some requiring authorization). A listed source or map search is NOT evidence that a particular provider is on duty. Do not use unverified results in emergencies. Call **112** or **166** if urgent.
+1. Choose location (GPS on request), date, category and specialty.
+2. Client automatically queries `/api/duty?region=attica|thessaloniki&date=YYYY-MM-DD` for hospitals, or `/api/pharmacies?city=...&date=YYYY-MM-DD` for pharmacy listings.
+3. Server downloads original published document/listing, validates the requested day, parses supported formats and returns named entries. Unknown layouts/dates are rejected, rather than misreported as available.
+4. Each entry provides a Google Maps **directions** button. Maps is not evidence that the establishment is on duty.
 
-## Sources
+**Safety:** If symptoms are urgent or life threatening, call 112 or 166. Published schedules may change; call ahead before travelling. Source availability is not a medical/operational guarantee.
 
-- Greek public national duty portal: https://efimeries.gov.gr/
-- Greek Ministry of Health: https://www.moh.gov.gr/articles/citizen/efhmeries-nosokomeiwn/
-- Attica daily hospital duty PDFs: https://www.moh.gov.gr/articles/citizen/efhmeries-nosokomeiwn/68-efhmeries-nosokomeiwn-attikhs
-- Thessaloniki hospital roster: https://www.4ype.gr/efimeries-nosokomeion/
-- Thessaloniki pharmacists: https://efimeries.fsth.gr/
-- Attica pharmacists: https://fsa-efimeries.gr/Home/
-- Nationwide pharmacy source directory: https://ehealthrecord.gov.gr/pharmacies
+## Official sources
 
-## Deployment
+- Ministry of Health Attica: https://www.moh.gov.gr/articles/citizen/efhmeries-nosokomeiwn/68-efhmeries-nosokomeiwn-attikhs
+- 3rd Health District Thessaloniki monthly rosters: https://www.3ype.gr/category/efimeries/
+- 4th Health District: https://www.4ype.gr/efimeries-nosokomeion/
+- Thessaloniki Pharmacists Association: https://efimeries.fsth.gr/
+- Independent pharmacy listings (third-party, not a health authority): https://www.iefimeria.gr/
 
-The root index.html is self-contained and framework-free. Vercel automatically detects /api/places.js, /api/reverse.js, and /api/attica-roster.js as serverless functions. No paid API key is required for the map-free frontend. Existing legacy map-related files remain in the repository for reference but are no longer loaded.
+## Technical stack
 
-## Privacy
+- Vanilla HTML/CSS/JavaScript in `index.html`
+- Vercel Node.js serverless functions in `api/`
+- `pdfjs-dist` to extract positioned text from official daily PDFs
+- `exceljs` to read official monthly XLSX schedules
+- `cheerio` to read published HTML listings
+- No Google Maps embed, no expensive maps API key, no simulated duty data
 
-Geolocation is opt-in. The app does not deliberately store location server-side, but location lookups use external services that may process request metadata. Prefer manual area entry if desired.
+## Known limitations
+
+- Cannot confirm operational status in real time; source is schedule rather than live triage information.
+- Not a nationwide full-coverage feed: each area must be integrated from an available, tested source.
+- XLSX and PDF layout changes can interrupt automated results; app fails closed.
+- External sources may block access or have stale data; the app should show that and never invent results.
+- Live build on Vercel requires verification; GitHub commit alone does not prove production deployment.
