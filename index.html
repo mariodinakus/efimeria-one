@@ -40,7 +40,9 @@ footer{color:var(--muted);font-size:11px;border-top:1px solid var(--border);padd
 <div class="eyebrow" data-i="section">ΑΝΑΖΗΤΗΣΗ ΕΦΗΜΕΡΙΩΝ</div>
 <div class="topline"><h2 id="resultTitle">Θεσσαλονίκη · Νοσοκομεία</h2><span id="dateView" class="hint"></span></div>
 <div id="notice" class="notlive"></div>
-<div id="atticaFiles" class="cards"></div><div id="cards" class="cards"></div>
+<div id="autoStatus" class="status" role="status" aria-live="polite"></div>
+<div id="autoResults" class="cards"></div>
+<details style="margin-top:18px"><summary style="cursor:pointer;color:var(--muted);font-size:12px;padding:12px 0" id="fallbackSummary">Επίσημες πηγές ελέγχου εφημεριών ↗</summary><div id="cards" class="cards"></div></details>
 </section>
 <div class="navbox"><h3 data-i="navTitle">Οδηγίες στο Google Maps</h3><p data-i="navInfo">Αφού επιβεβαιώσεις ποιος εφημερεύει, γράψε εδώ το όνομα ή τη διεύθυνσή του για άμεση πλοήγηση. Οι χάρτες Google δεν αποδεικνύουν εφημερία.</p><div class="navrow"><input id="destination" placeholder="Όνομα νοσοκομείου / φαρμακείου"><a id="mapsLink" class="action primary" href="https://www.google.com/maps" target="_blank" rel="noopener noreferrer" data-i="openMaps">Google Maps ↗</a></div></div>
 <section style="margin-top:34px"><div class="eyebrow" data-i="more">ΥΓΕΙΟΝΟΜΙΚΕΣ ΠΕΡΙΦΕΡΕΙΕΣ</div><div id="regions" class="source-list"></div></section>
@@ -68,6 +70,74 @@ function label(){return chosen[lang]||chosen.label||chosen.el||chosen.name||''}
 function sources(){if(type==='pharmacy'){if(isThess())return [{name:'thessPharm',href:U.thessPharm,primary:true},{name:'allPharm',href:U.pharmAll},{name:'national',href:U.national}];if(isAthens())return [{name:'attPharm',href:U.attPharm,primary:true},{name:'allPharm',href:U.pharmAll},{name:'national',href:U.national}];return [{name:'allPharm',href:U.pharmAll,primary:true},{name:'national',href:U.national}]}if(isThess())return [{name:'thessHosp',href:U.thessHosp,primary:true},{name:'national',href:U.national},{name:'ministry',href:U.ministry}];if(isAthens())return [{name:'attHosp',href:U.att,primary:true},{name:'national',href:U.national}];return [{name:'national',href:U.national,primary:true},{name:'ministry',href:U.ministry}]}
 function node(tag,cls,txt){let n=document.createElement(tag);if(cls)n.className=cls;if(txt)n.textContent=txt;return n}
 function link(text,url,primary){const a=node('a','action '+(primary?'primary':'alt'),text);a.href=url;a.target='_blank';a.rel='noopener noreferrer';return a}
+
+let autoRequest=0;
+function statusMessage(text,failed=false){const el=$('autoStatus');el.className=failed?'status error':'status';el.textContent=text}
+function autoLocale(gr,en){return lang==='el'?gr:en}
+function mapsURL(destination){return 'https://www.google.com/maps/dir/?api=1&destination='+encodeURIComponent(destination+', Greece')}
+function autoRegion(){if(type==='hospital')return isAthens()?'attica':null;if(isAthens())return 'athens';if(isThess()){
+ const word=norm(label());
+ if(word.includes('ΚΑΛΑΜΑΡΙΑ')||word.includes('KALAMARIA'))return 'kalamaria';
+ if(word.includes('ΚΟΡΔΕΛΙΟ')||word.includes('KORDELIO'))return 'kordelio';
+ if(word.includes('ΕΥΟΣΜ')||word.includes('EVOSM'))return 'evosmos';
+ return 'thessaloniki';
+}return null}
+async function loadAutomatic(date){
+ const id=++autoRequest,where=autoRegion(),box=$('autoResults');box.replaceChildren();
+ if(!where){
+  statusMessage(autoLocale('Δεν υπάρχει ακόμη αυτόματη αξιόπιστη τροφοδοσία για αυτή την περιοχή και κατηγορία. Δεν θα εμφανιστούν τυχαία αποτελέσματα.','No reliable automated feed yet for this region and category. We will not show guessed facilities.'),true);
+  return
+ }
+ const endpoint=type==='hospital'?'/api/duty?'+new URLSearchParams({region:where,date}):'/api/pharmacies?'+new URLSearchParams({city:where,date});
+ statusMessage(autoLocale('Αυτόματη ανάκτηση πραγματικών προγραμμάτων εφημερίας…','Automatically reading published duty schedules…'));
+ try{
+  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),25000);
+  let response;try{response=await fetch(endpoint,{signal:controller.signal,cache:'no-store'})}finally{clearTimeout(timer)}
+  const data=await response.json();if(id!==autoRequest)return;
+  if(!response.ok)throw Error(data.error||'Source unavailable');
+  const requested=type==='hospital'?($('specialty').value||'all'):'all';
+  const all=Array.isArray(data.entries)?data.entries:[];
+  const filtered=requested==='all'?all:all.filter(e=>e.specialty===requested);
+  const items=filtered.slice(0,100);
+  box.replaceChildren();
+  if(!items.length){
+   const reasons={
+    not_published:['Δεν έχει δημοσιευτεί πρόγραμμα για αυτή την ημερομηνία.','No published schedule for this date.'],
+    stale_source:['Η εξωτερική πηγή εμφανίζει άλλη ημερομηνία. Απορρίφθηκαν τα παλιότερα στοιχεία.','The source shows a different date; stale listings were rejected.'],
+    date_unavailable:['Η πηγή παρέχει μόνο τη σημερινή ημέρα.','This source supports today only.'],
+    parse_unavailable:['Η δομή της πηγής άλλαξε και δεν μπορεί να αναγνωστεί με ασφάλεια.','The source layout changed; safe parsing was not possible.']
+   };
+   const r=reasons[data.status]||[ 'Δεν εντοπίστηκαν επαληθεύσιμες εγγραφές για αυτή την επιλογή.', 'No reliable records found for this selection.' ];
+   statusMessage(lang==='el'?r[0]:r[1],true);return
+  }
+  const official=data.status==='published';
+  statusMessage(official?autoLocale(
+   items.length+' αποτελέσματα από το επίσημο ημερήσιο PDF του Υπουργείου Υγείας. Ώρες βάσει προγράμματος — επιβεβαίωσε πριν φύγεις.',
+   items.length+' entries extracted from the official daily Ministry PDF. Scheduled hours only; confirm before departure.'
+  ):autoLocale(
+   items.length+' δημοσιευμένες εφημερίες από ανεξάρτητη ιστοσελίδα για ευρύτερη περιοχή. Δεν είναι επίσημη πηγή και δεν επιβεβαιώνεται το «ανοιχτό τώρα».',
+   items.length+' published duty listings from an independent site covering a broader area. Not an official roster or confirmation of being open now.'
+  ));
+  for(const item of items){
+   if(!item||typeof item.name!=='string')continue;
+   const c=node('article','card');
+   c.append(node('span','tag',official?autoLocale('ΑΠΟ ΕΠΙΣΗΜΟ ΠΡΟΓΡΑΜΜΑ · ΗΜΕΡΗΣΙΟ PDF','OFFICIAL PUBLISHED ROSTER · PDF'):autoLocale('ΤΡΙΤΗ ΠΗΓΗ · ΧΡΕΙΑΖΕΤΑΙ ΤΗΛΕΦΩΝΙΚΗ ΕΠΙΒΕΒΑΙΩΣΗ','THIRD-PARTY REPORT · CALL TO CONFIRM')));
+   c.append(node('h3','',item.name));
+   const found=SP.find(s=>s[0]===item.specialty);
+   const specialty=found?(lang==='el'?found[1]:found[2]):item.specialty||'';
+   c.append(node('p','',(specialty?specialty+' · ':'')+(item.address?item.address+' · ':'')+(item.hours||'') ));
+   const actions=node('div','actions');
+   actions.append(link(autoLocale('Οδηγίες Google Maps ↗','Google Maps directions ↗'),mapsURL(item.address?item.name+', '+item.address:(item.name+', '+(item.area||label()))),true));
+   if(item.phone&&/^[+\d\s().-]{6,22}$/.test(item.phone))actions.append(link(autoLocale('Κλήση','Call'),'tel:'+item.phone.replace(/[^+\d]/g,''),false));
+   if(item.source&&/^https:\/\/(www\.moh\.gov\.gr|moh\.gov\.gr|www\.iefimeria\.gr)\//.test(item.source))actions.append(link(autoLocale('Αρχική πηγή','Original source'),item.source,false));
+   c.append(actions);box.append(c)
+  }
+ }catch(error){
+  if(id!==autoRequest)return;box.replaceChildren();
+  statusMessage(autoLocale('Η πηγή δεν απαντά ή δεν μπόρεσε να αναγνωστεί. Δεν εμφανίζω μη επιβεβαιωμένες εφημερίες.','The source is unavailable or could not be parsed. No unverified duty claims shown.'),true)
+ }
+}
+
 async function atticaDocs(date){
  const target=$('atticaFiles');target.replaceChildren();
  if(type!=='hospital'||!isAthens())return;
@@ -84,7 +154,7 @@ async function atticaDocs(date){
 function draw(){document.documentElement.lang=lang;$('language').textContent=lang==='el'?'EN':'ΕΛ';document.querySelectorAll('[data-i]').forEach(el=>{const value=tr(el.dataset.i);if(['hero','safety'].includes(el.dataset.i))el.innerHTML=value;else el.textContent=value});$('city').placeholder=tr('placeHolder');$('destination').placeholder=tr('destHolder');$('hospital').classList.toggle('active',type==='hospital');$('pharmacy').classList.toggle('active',type==='pharmacy');$('hospital').setAttribute('aria-selected',String(type==='hospital'));$('pharmacy').setAttribute('aria-selected',String(type==='pharmacy'));$('specialtyWrap').hidden=type==='pharmacy';$('specialty').replaceChildren();for(const [id,gr,en] of SP){const option=node('option','',lang==='el'?gr:en);option.value=id;$('specialty').append(option)}$('specialty').value=window.oldSpecialty||'all';
 $('city').value=label();$('cityOptions').replaceChildren();for(const city of CITIES){const opt=document.createElement('option');opt.value=lang==='el'?city[0]:city[1];$('cityOptions').append(opt)}
 $('resultTitle').textContent=label()+' · '+tr(type==='hospital'?'hospitals':'pharmacies');const date=$('date').value;const dateInfo=new Date(date+'T12:00:00');$('dateView').textContent=Number.isFinite(dateInfo.getTime())?dateInfo.toLocaleDateString(lang==='el'?'el-GR':'en-GB',{day:'numeric',month:'long',year:'numeric'}):'';
-$('notice').textContent=tr('notice');const root=$('cards');root.replaceChildren();const all=sources();atticaDocs(date);all.forEach((s,i)=>{const card=node('article','card'+(i===0?' primary':''));card.append(node('span','tag',i===0?tr('main'):tr('secondary')));card.append(node('h3','',tr(s.name)));card.append(node('p','',tr(type==='hospital'?'hospDesc':'pharmDesc')+' '+(type==='hospital'&&$('specialty').value!=='all'?tr('specialNote'):'')+' '+tr('confirm')));const actions=node('div','actions');actions.append(link(tr('open'),s.href,i===0));card.append(actions);root.append(card)});
+$('notice').textContent=autoLocale('Τα αποτελέσματα προέρχονται από δημοσιευμένα προγράμματα. Δεν παρέχεται εγγύηση για πραγματική διαθεσιμότητα: τηλεφώνησε πριν μετακινηθείς.','Results are extracted from published schedules; real-time availability is not guaranteed. Call before travelling.');$('fallbackSummary').textContent=autoLocale('Αν η αυτόματη αναζήτηση αποτύχει: επίσημες πηγές ↗','If the automatic search fails: official sources ↗');const root=$('cards');root.replaceChildren();const all=sources();loadAutomatic(date);all.forEach((s,i)=>{const card=node('article','card'+(i===0?' primary':''));card.append(node('span','tag',i===0?tr('main'):tr('secondary')));card.append(node('h3','',tr(s.name)));card.append(node('p','',tr(type==='hospital'?'hospDesc':'pharmDesc')+' '+(type==='hospital'&&$('specialty').value!=='all'?tr('specialNote'):'')+' '+tr('confirm')));const actions=node('div','actions');actions.append(link(tr('open'),s.href,i===0));card.append(actions);root.append(card)});
 const regions=$('regions');regions.replaceChildren();REG.forEach(([name,url])=>regions.append(link(name+' ↗',url,false)));updateMaps()}
 function updateMaps(){const value=$('destination').value.trim();let a=$('mapsLink');a.href=value?'https://www.google.com/maps/dir/?api=1&destination='+encodeURIComponent(value+', Greece'):'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(label()+', Greece');a.title=value?'Google Maps destination':'Google Maps area search (not proof of duty)'}
 function setCity(c){chosen=c;$('geoStatus').className='status';$('geoStatus').textContent=tr('found')+' '+(c[lang]||c.label||c.el);draw()}
