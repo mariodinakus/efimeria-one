@@ -1,168 +1,35 @@
 <!doctype html>
-<html lang="el">
-<head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#101820">
-<meta name="description" content="Εφημερίες νοσοκομείων και φαρμακείων στην Ελλάδα. Επίσημες πηγές, ειδικότητες και Google Maps.">
-<title>EFIMERIA ONE | Εφημερίες χωρίς χάρτη</title>
+<html lang="el"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#10161c">
+<meta name="description" content="Εφημερίες νοσοκομείων ανά ειδικότητα και φαρμακείων ανά περιοχή στην Ελλάδα, με Google Maps.">
+<title>EFIMERIA ONE — Ποιος εφημερεύει κοντά σου;</title>
 <link rel="icon" href="/assets/icon.svg" type="image/svg+xml">
-<style>
-:root{font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;color-scheme:dark;--bg:#0c1016;--panel:#171d26;--border:#2c3541;--txt:#f0f4f8;--muted:#a2afbc;--accent:#b9f3d8;--red:#f9a49b}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--txt)}a{color:inherit}button,input,select{font:inherit}button{cursor:pointer}a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
-.site{max-width:920px;margin:auto;padding:0 22px 65px}header{display:flex;align-items:center;justify-content:space-between;padding:24px 0;border-bottom:1px solid var(--border);gap:14px}.logo{display:flex;gap:11px;align-items:center;font-size:22px;font-weight:850;letter-spacing:-1px}.logo-mark{display:grid;place-items:center;background:var(--accent);color:#10251e;height:33px;width:33px;border-radius:11px;font-size:24px}.logo span:last-child{color:var(--accent)}.head-actions{display:flex;gap:9px;align-items:center}.outline{border:1px solid var(--border);border-radius:11px;background:var(--panel);color:var(--txt);padding:10px 13px;font-size:12px;font-weight:750}.emergency{background:#3e2225;color:#ffd3ce;border:1px solid #795052;padding:10px 13px;border-radius:11px;font-weight:850;text-decoration:none;white-space:nowrap;font-size:12px}
-h1{font-size:clamp(34px,5.3vw,59px);letter-spacing:-2px;line-height:1.12;margin:42px 0 13px}h1 em{font-style:normal;color:var(--accent)}.sub{color:var(--muted);line-height:1.7;max-width:730px;margin-bottom:24px;font-size:14px}.safety{border:1px solid #77504a;background:#2d2225;color:#f4d2cb;border-radius:12px;padding:14px 17px;font-size:13px;line-height:1.6;margin-bottom:21px}.safety a{font-weight:800}
-.panel{background:var(--panel);border:1px solid var(--border);border-radius:18px;padding:23px;margin:20px 0}.fields{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,.78fr);gap:14px;align-items:end}.field label{display:block;font-size:11px;letter-spacing:.5px;font-weight:850;text-transform:uppercase;color:var(--muted);margin-bottom:9px}.field input,.field select{width:100%;border:1px solid #3a4856;background:#101721;color:var(--txt);padding:13px;border-radius:10px;min-height:49px;outline:none}.field input:focus,.field select:focus{border-color:var(--accent)}.city-row{display:flex;gap:8px}.city-row input{min-width:0;flex:1}.gps{border:1px solid #48675b;background:#26382f;color:#c4f8df;border-radius:10px;white-space:nowrap;padding:0 13px;font-size:12px;font-weight:800}.hint{font-size:11px;color:var(--muted);margin:10px 0 0;line-height:1.6}.status{padding:9px 12px;border-radius:10px;background:#172c2b;color:#c0e9d8;font-size:12px;margin-top:13px}.status:empty{display:none}.status.error{color:#ffd3ce;background:#452c31}
-.tabs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:22px}.tab{display:flex;gap:11px;justify-content:center;align-items:center;background:#121922;color:#bec9d1;border:1px solid var(--border);padding:15px 10px;border-radius:11px;font-weight:800}.tab.active{background:#204037;border-color:#7eceaf;color:#d3ffe8}.tab b{font-size:21px;font-weight:600}.specialty{margin-top:16px}.topline{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.topline h2{margin:0;font-size:24px;letter-spacing:-.7px}.eyebrow{font-size:10px;letter-spacing:2px;font-weight:850;color:var(--accent);margin-bottom:9px}.notlive{padding:14px;border-left:3px solid #debd80;background:#2d2a24;color:#e6d5b7;border-radius:0 8px 8px 0;font-size:13px;line-height:1.65;margin:19px 0}
-.cards{display:grid;gap:13px}.card{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:23px}.card.primary{border-color:#53796d;background:linear-gradient(125deg,#192e2a,#19212a)}.tag{font-size:10px;color:var(--accent);letter-spacing:1.4px;font-weight:850;text-transform:uppercase}.card h3{font-size:19px;letter-spacing:-.4px;margin:10px 0}.card p{font-size:13px;color:var(--muted);line-height:1.7;margin:0 0 20px}.card .actions{display:flex;flex-wrap:wrap;gap:9px}.action{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;border-radius:10px;padding:12px 16px;font-size:12px;font-weight:850;min-height:43px;border:1px solid var(--border)}.action.primary{background:var(--accent);color:#17241c;border-color:var(--accent)}.action.alt{color:#e4edf2;background:#26333d}.other{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-top:13px}
-.navbox{border:1px solid var(--border);background:#141b23;padding:20px 23px;border-radius:17px;margin-top:23px}.navbox h3{margin:0 0 5px}.navbox p{font-size:12px;line-height:1.65;color:var(--muted)}.navrow{display:flex;gap:9px}.navrow input{min-width:0;flex:1;background:#101721;border:1px solid #3c4a59;border-radius:9px;padding:12px;color:white}.navrow a{white-space:nowrap}.source-list{display:flex;flex-wrap:wrap;gap:9px}.source-list a{border:1px solid var(--border);padding:11px;border-radius:9px;background:var(--panel);font-size:11px;text-decoration:none}.source-list a:hover{border-color:var(--accent)}
-footer{color:var(--muted);font-size:11px;border-top:1px solid var(--border);padding-top:19px;margin-top:44px;line-height:1.7}footer a{text-decoration:underline}.spacer{height:4px}
-@media(max-width:600px){.site{padding:0 15px 35px}header{padding:17px 0}.logo{font-size:18px}.logo-mark{height:30px;width:30px;font-size:20px}h1{margin-top:28px}.fields,.other{grid-template-columns:1fr}.panel{padding:16px}.navrow{flex-direction:column}.card{padding:19px}.card .actions a{flex:1}.tab{font-size:12px}.topline h2{font-size:21px}.emergency{padding:9px}.outline{padding:9px}}
-</style>
-</head>
-<body>
-<div class="site">
-<header><div class="logo"><span class="logo-mark">✚</span><div>efimeria<span>.</span> ONE</div></div><div class="head-actions"><button id="language" type="button" class="outline">EN</button><a class="emergency" href="tel:112">SOS 112</a></div></header>
+<link rel="stylesheet" href="/v5.css?v=5.1">
+<script src="/v5.js?v=5.1" defer></script>
+</head><body><div class="app">
+<header><div class="logo"><span class="mark">✚</span><span>efimeria<span class="mint">.</span><small>ONE</small></span></div><div class="top-right"><button id="language" type="button" class="ghost">EN</button><a class="sos" href="tel:112">SOS <b>112</b></a></div></header>
 <main>
-<h1 data-i="hero">Τι <em>εφημερεύει</em> σήμερα;</h1>
-<p class="sub" data-i="sub">Νοσοκομεία ανά ειδικότητα και φαρμακεία στην Ελλάδα. Μόνο προγράμματα εφημεριών — όχι γενικός χάρτης επιχειρήσεων.</p>
-<div class="safety" data-i="safety">Για σοβαρό ή απειλητικό για τη ζωή επείγον περιστατικό κάλεσε αμέσως <a href="tel:112">112</a> ή <a href="tel:166">166</a>. Μην περιμένεις επιβεβαίωση από ιστοσελίδα.</div>
-<section class="panel" aria-label="Αναζήτηση εφημερίας">
-<div class="fields">
-<div class="field"><label for="city" data-i="area">Περιοχή</label><div class="city-row"><input id="city" autocomplete="address-level2" list="cityOptions" placeholder="π.χ. Μενεμένη, Αθήνα, Πάτρα"><button id="locate" class="gps" type="button" data-i="gps">⌖ GPS</button></div><datalist id="cityOptions"></datalist></div>
-<div class="field"><label for="date" data-i="date">Ημερομηνία εφημερίας</label><input type="date" id="date"></div>
-</div>
-<p class="hint" data-i="gpsNote">Η περιοχή μπορεί να πληκτρολογηθεί χειροκίνητα. Το GPS χρησιμοποιείται μόνο αν δώσεις άδεια.</p>
-<div id="geoStatus" class="status" role="status" aria-live="polite"></div>
-<div class="tabs" role="tablist"><button id="hospital" class="tab active" type="button" role="tab" aria-selected="true"><b>✚</b> <span data-i="hospitals">Νοσοκομεία</span></button><button id="pharmacy" class="tab" type="button" role="tab" aria-selected="false"><b>✳</b> <span data-i="pharmacies">Φαρμακεία</span></button></div>
-<div class="field specialty" id="specialtyWrap"><label for="specialty" data-i="specialty">Ιατρική ειδικότητα</label><select id="specialty"></select></div>
+<div class="top-title"><div class="eyebrow" data-t="kicker">ΕΦΗΜΕΡΙΕΣ · ΕΛΛΑΔΑ</div><h1 data-html="heading">Ποιος <em>εφημερεύει</em> κοντά σου;</h1><p data-t="summary">Χωρίς χάρτες και PDF. Δες δημοσιευμένες εφημερίες, ειδικότητες, ώρες, τηλέφωνα και Google Maps.</p></div>
+<div class="alert"><span class="alert-icon">!</span><p data-html="emergency">Σοβαρό επείγον; Κάλεσε <a href="tel:112">112</a> ή <a href="tel:166">166</a>. Τα δημοσιευμένα προγράμματα δεν εγγυώνται διαθεσιμότητα σε πραγματικό χρόνο.</p></div>
+<section class="finder">
+<div class="question"><div><div class="overline" data-t="locationLabel">ΠΕΡΙΟΧΗ ΑΝΑΖΗΤΗΣΗΣ</div><h2 id="areaQuestion">Είσαι στη Μενεμένη;</h2><p id="areaNote">Προεπιλεγμένη περιοχή · επιβεβαίωσε ή άλλαξέ την</p></div><span class="pin">⌖</span></div>
+<div class="area-actions"><button id="confirmArea" type="button" class="btn primary">✓ <span data-t="confirm">Ναι, Μενεμένη</span></button><button id="toggleArea" type="button" class="btn outline" data-t="change">Άλλη περιοχή</button><button id="gps" type="button" class="btn outline"><span class="gpsIcon">⌖</span> GPS</button></div>
+<form id="areaForm" class="area-form" hidden><label for="city" data-t="cityLabel">Πόλη / γειτονιά</label><div class="input-row"><input id="city" list="cities" autocomplete="address-level2" placeholder="Μενεμένη, Θεσσαλονίκη, Αθήνα..."><datalist id="cities"></datalist><button class="btn primary" type="submit" data-t="search">Αναζήτηση</button></div></form>
+<div id="message" role="status" aria-live="polite"></div>
 </section>
-<section aria-live="polite">
-<div class="eyebrow" data-i="section">ΑΝΑΖΗΤΗΣΗ ΕΦΗΜΕΡΙΩΝ</div>
-<div class="topline"><h2 id="resultTitle">Θεσσαλονίκη · Νοσοκομεία</h2><span id="dateView" class="hint"></span></div>
-<div id="notice" class="notlive"></div>
-<div id="autoStatus" class="status" role="status" aria-live="polite"></div>
-<div id="autoResults" class="cards"></div>
-<details style="margin-top:18px"><summary style="cursor:pointer;color:var(--muted);font-size:12px;padding:12px 0" id="fallbackSummary">Επίσημες πηγές ελέγχου εφημεριών ↗</summary><div id="cards" class="cards"></div></details>
+<div class="controls"><div class="date-controls"><button id="nowTab" class="choice active" type="button" data-t="now">Τρέχουσα εφημερία</button><button id="dayTab" class="choice" type="button" data-t="chooseDate">Επιλογή ημερομηνίας</button></div><div id="pickerWrap" hidden><label for="date" data-t="dutyDate">Ημερομηνία</label><input type="date" id="date"></div></div>
+<section id="hospitalSection" class="section">
+<div class="section-bar"><span class="section-icon hospital">✚</span><div><div class="overline">01 / HOSPITAL DUTY</div><h2 data-t="hospitalTitle">Εφημερεύοντα νοσοκομεία</h2><p id="hospitalSubtitle" class="subcaption"></p></div></div>
+<div class="specialty"><label for="specialty" data-t="specialty">Φίλτρο ειδικότητας</label><select id="specialty"></select></div>
+<div id="hospitalMeta" class="notice" aria-live="polite" data-state="loading">Αναζήτηση δημοσιευμένων εφημεριών…</div>
+<div id="hospitals" class="results"></div>
+<div id="nextWrap" class="next-wrap" hidden><div class="next-head"><h3 id="nextTitle">Επόμενη αλλαγή εφημερίας</h3><span id="nextTime"></span></div><div id="nextResults" class="results"></div></div>
 </section>
-<div class="navbox"><h3 data-i="navTitle">Οδηγίες στο Google Maps</h3><p data-i="navInfo">Αφού επιβεβαιώσεις ποιος εφημερεύει, γράψε εδώ το όνομα ή τη διεύθυνσή του για άμεση πλοήγηση. Οι χάρτες Google δεν αποδεικνύουν εφημερία.</p><div class="navrow"><input id="destination" placeholder="Όνομα νοσοκομείου / φαρμακείου"><a id="mapsLink" class="action primary" href="https://www.google.com/maps" target="_blank" rel="noopener noreferrer" data-i="openMaps">Google Maps ↗</a></div></div>
-<section style="margin-top:34px"><div class="eyebrow" data-i="more">ΥΓΕΙΟΝΟΜΙΚΕΣ ΠΕΡΙΦΕΡΕΙΕΣ</div><div id="regions" class="source-list"></div></section>
-</main>
-<footer><span data-i="foot">Ανεξάρτητο εργαλείο πλοήγησης σε δημοσιευμένες εφημερίες. Δεν πιστοποιεί ότι συγκεκριμένο τμήμα ή φαρμακείο εφημερεύει αυτή τη στιγμή. Επιβεβαίωσε πρόγραμμα, ώρα και τηλέφωνο πριν ξεκινήσεις.</span><p>EFIMERIA ONE · v3.0 · Greece / Ελλάδα</p></footer>
-</div>
-<script>
-(()=>{'use strict';
-const $=id=>document.getElementById(id);
-const U={national:'https://efimeries.gov.gr/',ministry:'https://www.moh.gov.gr/articles/citizen/efhmeries-nosokomeiwn/',att:'https://www.moh.gov.gr/articles/citizen/efhmeries-nosokomeiwn/68-efhmeries-nosokomeiwn-attikhs',thessHosp:'https://www.4ype.gr/efimeries-nosokomeion/',thessPharm:'https://efimeries.fsth.gr/',attPharm:'https://fsa-efimeries.gr/Home/',pharmAll:'https://ehealthrecord.gov.gr/pharmacies'};
-const REG=[['1η ΥΠΕ','https://www.1dype.gov.gr/'],['2η ΥΠΕ','https://www.2dype.gov.gr/'],['3η ΥΠΕ','https://www.3ype.gr/'],['4η ΥΠΕ',U.thessHosp],['5η ΥΠΕ','https://www.dypethessaly.gr/'],['6η ΥΠΕ','https://www.dypede.gr/'],['7η ΥΠΕ','https://www.7ype.gov.gr/']];
-const CITIES=[['Μενεμένη','Menemeni',40.6574,22.9073],['Θεσσαλονίκη','Thessaloniki',40.6401,22.9444],['Εύοσμος','Evosmos',40.6707,22.906],['Καλαμαριά','Kalamaria',40.5848,22.9509],['Αθήνα','Athens',37.9838,23.7275],['Πειραιάς','Piraeus',37.943,23.647],['Περιστέρι','Peristeri',38.015,23.691],['Πάτρα','Patras',38.2466,21.7346],['Ηράκλειο','Heraklion',35.3387,25.1442],['Χανιά','Chania',35.5138,24.018],['Ρέθυμνο','Rethymno',35.3656,24.4822],['Λάρισα','Larissa',39.639,22.4191],['Βόλος','Volos',39.361,22.9425],['Ιωάννινα','Ioannina',39.6649,20.8519],['Καβάλα','Kavala',40.9369,24.4129],['Σέρρες','Serres',41.0856,23.5497],['Βέροια','Veria',40.5244,22.2024],['Γιαννιτσά','Giannitsa',40.7937,22.4077],['Κατερίνη','Katerini',40.2696,22.5061],['Κοζάνη','Kozani',40.3,21.789],['Καστοριά','Kastoria',40.52,21.268],['Ρόδος','Rhodes',36.4348,28.2176],['Κέρκυρα','Corfu',39.6243,19.9217],['Τρίκαλα','Trikala',39.555,21.769],['Καρδίτσα','Karditsa',39.365,21.922],['Λαμία','Lamia',38.9,22.433],['Χαλκίδα','Chalkida',38.462,23.594],['Καλαμάτα','Kalamata',37.042,22.114],['Τρίπολη','Tripoli',37.508,22.379],['Αγρίνιο','Agrinio',38.623,21.407],['Κόρινθος','Corinth',37.938,22.934],['Σπάρτη','Sparta',37.074,22.431],['Άρτα','Arta',39.16,20.985],['Πρέβεζα','Preveza',38.95,20.751],['Αλεξανδρούπολη','Alexandroupoli',40.844,25.876],['Κομοτηνή','Komotini',41.119,25.406],['Ξάνθη','Xanthi',41.135,24.887],['Δράμα','Drama',41.151,24.147],['Χίος','Chios',38.369,26.136],['Σάμος','Samos',37.755,26.978],['Νάξος','Naxos',37.106,25.377],['Μυτιλήνη','Mytilene',39.107,26.555],['Σύρος','Syros',37.442,24.943],['Κως','Kos',36.894,27.288],['Ζάκυνθος','Zakynthos',37.788,20.899],['Λευκάδα','Lefkada',38.833,20.706],['Χανιά','Chania',35.5138,24.018]];
-const SP=[['all','Όλες οι ειδικότητες','All specialties'],['internal','Παθολογική','Internal medicine'],['cardiology','Καρδιολογική','Cardiology'],['pediatrics','Παιδιατρική','Pediatrics'],['surgery','Χειρουργική','Surgery'],['orthopedic','Ορθοπεδική','Orthopedics'],['gynecology','Γυναικολογική','Gynecology'],['neurology','Νευρολογική','Neurology'],['psychiatry','Ψυχιατρική','Psychiatry'],['ent','ΩΡΛ','ENT'],['ophthalmology','Οφθαλμολογική','Ophthalmology']];
-const TEXT={
-el:{hero:'Τι <em>εφημερεύει</em> σήμερα;',sub:'Νοσοκομεία ανά ειδικότητα και φαρμακεία στην Ελλάδα. Μόνο προγράμματα εφημεριών — όχι γενικός χάρτης επιχειρήσεων.',safety:'Για σοβαρό ή απειλητικό για τη ζωή επείγον περιστατικό κάλεσε αμέσως <a href="tel:112">112</a> ή <a href="tel:166">166</a>. Μην περιμένεις επιβεβαίωση από ιστοσελίδα.',area:'Περιοχή',date:'Ημερομηνία εφημερίας',gps:'⌖ GPS',gpsNote:'Η περιοχή μπορεί να πληκτρολογηθεί χειροκίνητα. Το GPS χρησιμοποιείται μόνο αν δώσεις άδεια.',hospitals:'Νοσοκομεία',pharmacies:'Φαρμακεία',specialty:'Ιατρική ειδικότητα',section:'ΕΦΗΜΕΡΙΕΣ ΑΝΑ ΠΕΡΙΟΧΗ',navTitle:'Οδηγίες στο Google Maps',navInfo:'Αφού επιβεβαιώσεις ποιος εφημερεύει, γράψε εδώ το όνομα ή τη διεύθυνσή του για άμεση πλοήγηση. Οι χάρτες Google δεν αποδεικνύουν εφημερία.',openMaps:'Google Maps ↗',more:'ΥΓΕΙΟΝΟΜΙΚΕΣ ΠΕΡΙΦΕΡΕΙΕΣ',foot:'Ανεξάρτητο εργαλείο πλοήγησης σε δημοσιευμένες εφημερίες. Δεν πιστοποιεί ότι συγκεκριμένο τμήμα ή φαρμακείο εφημερεύει αυτή τη στιγμή. Επιβεβαίωσε πρόγραμμα, ώρα και τηλέφωνο πριν ξεκινήσεις.',notice:'Δεν υπάρχει διαθέσιμο ενιαίο, επαληθευμένο δημόσιο API εφημεριών για όλη την Ελλάδα. Τα παρακάτω ανοίγουν τα πραγματικά δημοσιευμένα προγράμματα, δεν παρουσιάζουν μη επιβεβαιωμένα ονόματα ως «ανοιχτά τώρα».',main:'Πρόγραμμα εφημεριών για την περιοχή',open:'Δες ποιος εφημερεύει ↗',pharmDesc:'Στην επίσημη πηγή δες εφημερεύοντα και διανυκτερεύοντα φαρμακεία με ωράριο.',hospDesc:'Στο επίσημο πρόγραμμα δες νοσοκομεία, τμήματα και ώρες για την επιλεγμένη ημερομηνία.',specialNote:'Διάλεξε την ειδικότητα μέσα στο δημοσιευμένο πρόγραμμα. Η επιλογή σου εδώ δεν επιβεβαιώνει διαθεσιμότητα.',secondary:'Εναλλακτική επίσημη πηγή',national:'Πανελλαδική πύλη εφημεριών',allPharm:'Εθνικός Ηλεκτρονικός Φάκελος Υγείας',attHosp:'Υπουργείο Υγείας · Εφημερίες Αττικής',thessHosp:'4η ΥΠΕ · Νοσοκομεία Θεσσαλονίκης',thessPharm:'Φαρμακευτικός Σύλλογος Θεσσαλονίκης',attPharm:'Φαρμακευτικός Σύλλογος Αττικής',ministry:'Υπουργείο Υγείας',typing:'Γράψε την περιοχή και πάτησε Enter.',searching:'Αναζήτηση περιοχής…',notfound:'Δεν αναγνωρίστηκε η περιοχή. Δοκίμασε πόλη ή μεγαλύτερο δήμο.',found:'Επιλέχθηκε περιοχή:',locating:'Εντοπισμός GPS…',gpsDenied:'Το GPS δεν επιτρέπεται. Γράψε περιοχή χειροκίνητα.',gpsFail:'Δεν βρέθηκε θέση. Γράψε περιοχή χειροκίνητα.',gpsHttps:'Το GPS απαιτεί HTTPS.',approx:'Σχετική περιοχή GPS:',confirm:'Επιβεβαίωσε ημερομηνία και ειδικότητα στην πηγή.',placeHolder:'π.χ. Μενεμένη, Αθήνα, Πάτρα',destHolder:'Όνομα νοσοκομείου ή φαρμακείου',zone:'Περιοχή αναζήτησης',noMaps:'Πληκτρολόγησε πρώτα ένα όνομα ή μια διεύθυνση.'},
-en:{hero:'Who is <em>on duty</em> today?',sub:'Hospital duty schedules by specialty and on-duty pharmacies across Greece. No embedded map or generic business listings.',safety:'For a serious or life-threatening emergency, immediately call <a href="tel:112">112</a> or <a href="tel:166">166</a>. Do not wait for a website.',area:'Area',date:'Duty date',gps:'⌖ GPS',gpsNote:'You can enter an area manually. Location is requested only if you grant permission.',hospitals:'Hospitals',pharmacies:'Pharmacies',specialty:'Medical specialty',section:'DUTY SCHEDULES BY AREA',navTitle:'Directions with Google Maps',navInfo:'After checking who is on duty, enter their name or address for directions. Google Maps does not verify duty status.',openMaps:'Google Maps ↗',more:'REGIONAL HEALTH AUTHORITIES',foot:'Independent guide to published duty schedules. We cannot certify whether an individual department or pharmacy is on duty right now. Verify date, hours and phone number before travelling.',notice:'There is no single verified public live duty API covering every Greek region. These links open published schedules; we do not label unverified facilities as “open now”.',main:'Duty schedule for this area',open:'View on-duty listings ↗',pharmDesc:'Check the official source for daytime and overnight pharmacies and hours.',hospDesc:'Check the published hospital rota for the date, department and hours.',specialNote:'Select the specialty inside the published schedule. Your choice here is not proof of availability.',secondary:'Alternative official source',national:'National duty portal',allPharm:'National eHealth pharmacy directory',attHosp:'Health Ministry · Attica hospitals',thessHosp:'4th Health District · Thessaloniki hospitals',thessPharm:'Thessaloniki Pharmacists Association',attPharm:'Attica Pharmacists Association',ministry:'Greek Health Ministry',typing:'Enter an area and press Enter.',searching:'Searching for area…',notfound:'Area not found. Try a nearby city or municipality.',found:'Selected area:',locating:'Locating by GPS…',gpsDenied:'Location permission denied. Enter your area manually.',gpsFail:'Location unavailable. Enter your area manually.',gpsHttps:'GPS needs HTTPS.',approx:'Approximate GPS area:',confirm:'Confirm date and specialty with the provider.',placeHolder:'e.g. Menemeni, Athens, Patras',destHolder:'Hospital or pharmacy name / address',zone:'Search area',noMaps:'Enter a name or address first.'}};
-const norm=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/ς/g,'σ').toLowerCase().trim();
-const d=(a,b,c,e)=>{const r=Math.PI/180;const v=Math.sin((c-a)*r/2)**2+Math.cos(a*r)*Math.cos(c*r)*Math.sin((e-b)*r/2)**2;return 6371*2*Math.asin(Math.sqrt(v))};
-let lang=localStorage.getItem('efimeria-lang')==='en'?'en':'el',type='hospital',chosen={el:'Θεσσαλονίκη',en:'Thessaloniki',lat:40.6401,lon:22.9444},seq=0;
-const tr=k=>TEXT[lang][k]||k;
-function today(){const parts=new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Athens',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());const obj=Object.fromEntries(parts.map(p=>[p.type,p.value]));return obj.year+'-'+obj.month+'-'+obj.day}
-function isThess(){return d(chosen.lat,chosen.lon,40.6401,22.9444)<55}
-function isAthens(){return d(chosen.lat,chosen.lon,37.9838,23.7275)<70}
-function label(){return chosen[lang]||chosen.label||chosen.el||chosen.name||''}
-function sources(){if(type==='pharmacy'){if(isThess())return [{name:'thessPharm',href:U.thessPharm,primary:true},{name:'allPharm',href:U.pharmAll},{name:'national',href:U.national}];if(isAthens())return [{name:'attPharm',href:U.attPharm,primary:true},{name:'allPharm',href:U.pharmAll},{name:'national',href:U.national}];return [{name:'allPharm',href:U.pharmAll,primary:true},{name:'national',href:U.national}]}if(isThess())return [{name:'thessHosp',href:U.thessHosp,primary:true},{name:'national',href:U.national},{name:'ministry',href:U.ministry}];if(isAthens())return [{name:'attHosp',href:U.att,primary:true},{name:'national',href:U.national}];return [{name:'national',href:U.national,primary:true},{name:'ministry',href:U.ministry}]}
-function node(tag,cls,txt){let n=document.createElement(tag);if(cls)n.className=cls;if(txt)n.textContent=txt;return n}
-function link(text,url,primary){const a=node('a','action '+(primary?'primary':'alt'),text);a.href=url;a.target='_blank';a.rel='noopener noreferrer';return a}
-
-let autoRequest=0;
-function statusMessage(text,failed=false){const el=$('autoStatus');el.className=failed?'status error':'status';el.textContent=text}
-function autoLocale(gr,en){return lang==='el'?gr:en}
-function mapsURL(destination){return 'https://www.google.com/maps/dir/?api=1&destination='+encodeURIComponent(destination+', Greece')}
-function autoRegion(){if(type==='hospital')return isAthens()?'attica':isThess()?'thessaloniki':null;if(isAthens())return 'athens';if(d(chosen.lat,chosen.lon,38.2466,21.7346)<25)return 'patras';if(d(chosen.lat,chosen.lon,39.639,22.4191)<24)return 'larissa';if(d(chosen.lat,chosen.lon,40.9369,24.4129)<22)return 'kavala';if(isThess()){
- const word=norm(label());
- if(word.includes('ΚΑΛΑΜΑΡΙΑ')||word.includes('KALAMARIA'))return 'kalamaria';
- if(word.includes('ΚΟΡΔΕΛΙΟ')||word.includes('KORDELIO'))return 'kordelio';
- if(word.includes('ΕΥΟΣΜ')||word.includes('EVOSM'))return 'evosmos';
- return 'thessaloniki';
-}return null}
-async function loadAutomatic(date){
- const id=++autoRequest,where=autoRegion(),box=$('autoResults');box.replaceChildren();
- if(!where){
-  statusMessage(autoLocale('Δεν υπάρχει ακόμη αυτόματη αξιόπιστη τροφοδοσία για αυτή την περιοχή και κατηγορία. Δεν θα εμφανιστούν τυχαία αποτελέσματα.','No reliable automated feed yet for this region and category. We will not show guessed facilities.'),true);
-  return
- }
- const endpoint=type==='hospital'?'/api/duty?'+new URLSearchParams({region:where,date}):'/api/pharmacies?'+new URLSearchParams({city:where,date});
- statusMessage(autoLocale('Αυτόματη ανάκτηση πραγματικών προγραμμάτων εφημερίας…','Automatically reading published duty schedules…'));
- try{
-  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),25000);
-  let response;try{response=await fetch(endpoint,{signal:controller.signal,cache:'no-store'})}finally{clearTimeout(timer)}
-  const data=await response.json();if(id!==autoRequest)return;
-  if(!response.ok)throw Error(data.error||'Source unavailable');
-  const requested=type==='hospital'?($('specialty').value||'all'):'all';
-  const all=Array.isArray(data.entries)?data.entries:[];
-  const filtered=requested==='all'?all:all.filter(e=>e.specialty===requested);
-  const items=filtered.slice(0,100);
-  box.replaceChildren();
-  if(!items.length){
-   const reasons={
-    not_published:['Δεν έχει δημοσιευτεί πρόγραμμα για αυτή την ημερομηνία.','No published schedule for this date.'],
-    stale_source:['Η εξωτερική πηγή εμφανίζει άλλη ημερομηνία. Απορρίφθηκαν τα παλιότερα στοιχεία.','The source shows a different date; stale listings were rejected.'],
-    date_unavailable:['Η πηγή παρέχει μόνο τη σημερινή ημέρα.','This source supports today only.'],
-    parse_unavailable:['Η δομή της πηγής άλλαξε και δεν μπορεί να αναγνωστεί με ασφάλεια.','The source layout changed; safe parsing was not possible.']
-   };
-   const r=reasons[data.status]||[ 'Δεν εντοπίστηκαν επαληθεύσιμες εγγραφές για αυτή την επιλογή.', 'No reliable records found for this selection.' ];
-   statusMessage(lang==='el'?r[0]:r[1],true);return
-  }
-  const official=data.status==='published';
-  statusMessage(official?autoLocale(
-   items.length+' αποτελέσματα από το επίσημο ημερήσιο PDF του Υπουργείου Υγείας. Ώρες βάσει προγράμματος — επιβεβαίωσε πριν φύγεις.',
-   items.length+' entries extracted from the official daily Ministry PDF. Scheduled hours only; confirm before departure.'
-  ):autoLocale(
-   items.length+' δημοσιευμένες εφημερίες από ανεξάρτητη ιστοσελίδα για ευρύτερη περιοχή. Δεν είναι επίσημη πηγή και δεν επιβεβαιώνεται το «ανοιχτό τώρα».',
-   items.length+' published duty listings from an independent site covering a broader area. Not an official roster or confirmation of being open now.'
-  ));
-  for(const item of items){
-   if(!item||typeof item.name!=='string')continue;
-   const c=node('article','card');
-   c.append(node('span','tag',official?autoLocale('ΑΠΟ ΕΠΙΣΗΜΟ ΠΡΟΓΡΑΜΜΑ · ΗΜΕΡΗΣΙΟ PDF','OFFICIAL PUBLISHED ROSTER · PDF'):autoLocale('ΤΡΙΤΗ ΠΗΓΗ · ΧΡΕΙΑΖΕΤΑΙ ΤΗΛΕΦΩΝΙΚΗ ΕΠΙΒΕΒΑΙΩΣΗ','THIRD-PARTY REPORT · CALL TO CONFIRM')));
-   c.append(node('h3','',item.name));
-   const found=SP.find(s=>s[0]===item.specialty);
-   const specialty=found?(lang==='el'?found[1]:found[2]):item.specialty||'';
-   c.append(node('p','',(specialty?specialty+' · ':'')+(item.address?item.address+' · ':'')+(item.hours||'') ));
-   const actions=node('div','actions');
-   actions.append(link(autoLocale('Οδηγίες Google Maps ↗','Google Maps directions ↗'),mapsURL(item.address?item.name+', '+item.address:(item.name+', '+(item.area||label()))),true));
-   if(item.phone&&/^[+\d\s().-]{6,22}$/.test(item.phone))actions.append(link(autoLocale('Κλήση','Call'),'tel:'+item.phone.replace(/[^+\d]/g,''),false));
-   if(item.source&&/^https:\/\/(www\.moh\.gov\.gr|moh\.gov\.gr|www\.iefimeria\.gr)\//.test(item.source))actions.append(link(autoLocale('Αρχική πηγή','Original source'),item.source,false));
-   c.append(actions);box.append(c)
-  }
- }catch(error){
-  if(id!==autoRequest)return;box.replaceChildren();
-  statusMessage(autoLocale('Η πηγή δεν απαντά ή δεν μπόρεσε να αναγνωστεί. Δεν εμφανίζω μη επιβεβαιωμένες εφημερίες.','The source is unavailable or could not be parsed. No unverified duty claims shown.'),true)
- }
-}
-
-async function atticaDocs(date){
- const target=$('atticaFiles');target.replaceChildren();
- if(type!=='hospital'||!isAthens())return;
- const card=node('article','card');card.append(node('span','tag',lang==='el'?'ΕΠΙΣΗΜΟ ΑΡΧΕΙΟ ΗΜΕΡΑΣ':'OFFICIAL DAILY FILE'));card.append(node('h3','',lang==='el'?'Εφημερίες Αττικής — '+date:'Attica duty roster — '+date));card.append(node('p','',lang==='el'?'Αναζήτηση δημοσιευμένου αρχείου Υπουργείου Υγείας για την ημέρα...':'Checking the Ministry for this date...'));target.append(card);
- try{
-  const r=await fetch('/api/attica-roster?date='+encodeURIComponent(date),{cache:'no-store'});if(!r.ok)throw Error();
-  const j=await r.json();if(type!=='hospital'||!isAthens()||date!==$('date').value)return;
-  target.replaceChildren();if(!j.files?.length)return;
-  for(const f of j.files){
-   const c=node('article','card primary');c.append(node('span','tag',lang==='el'?'ΕΠΙΣΗΜΟ ΑΡΧΕΙΟ · ΔΗΜΟΣΙΕΥΜΕΝΟ':'OFFICIAL PUBLISHED DOCUMENT'));c.append(node('h3','',f.title));c.append(node('p','',lang==='el'?'Άνοιξε το πρόγραμμα για τις ειδικότητες και τα νοσοκομεία. Δεν αποτελεί αυτόματη επιβεβαίωση διαθεσιμότητας.':'Open the document to review specialties and hospitals. Availability still requires confirmation.'));const actions=node('div','actions');actions.append(link(lang==='el'?'Άνοιγμα επίσημου αρχείου ↗':'Open official file ↗',f.url,true));c.append(actions);target.append(c)
-  }
- }catch{target.replaceChildren()}
-}
-function draw(){document.documentElement.lang=lang;$('language').textContent=lang==='el'?'EN':'ΕΛ';document.querySelectorAll('[data-i]').forEach(el=>{const value=tr(el.dataset.i);if(['hero','safety'].includes(el.dataset.i))el.innerHTML=value;else el.textContent=value});$('city').placeholder=tr('placeHolder');$('destination').placeholder=tr('destHolder');$('hospital').classList.toggle('active',type==='hospital');$('pharmacy').classList.toggle('active',type==='pharmacy');$('hospital').setAttribute('aria-selected',String(type==='hospital'));$('pharmacy').setAttribute('aria-selected',String(type==='pharmacy'));$('specialtyWrap').hidden=type==='pharmacy';$('specialty').replaceChildren();for(const [id,gr,en] of SP){const option=node('option','',lang==='el'?gr:en);option.value=id;$('specialty').append(option)}$('specialty').value=window.oldSpecialty||'all';
-$('city').value=label();$('cityOptions').replaceChildren();for(const city of CITIES){const opt=document.createElement('option');opt.value=lang==='el'?city[0]:city[1];$('cityOptions').append(opt)}
-$('resultTitle').textContent=label()+' · '+tr(type==='hospital'?'hospitals':'pharmacies');const date=$('date').value;const dateInfo=new Date(date+'T12:00:00');$('dateView').textContent=Number.isFinite(dateInfo.getTime())?dateInfo.toLocaleDateString(lang==='el'?'el-GR':'en-GB',{day:'numeric',month:'long',year:'numeric'}):'';
-$('notice').textContent=autoLocale('Τα αποτελέσματα προέρχονται από δημοσιευμένα προγράμματα. Δεν παρέχεται εγγύηση για πραγματική διαθεσιμότητα: τηλεφώνησε πριν μετακινηθείς.','Results are extracted from published schedules; real-time availability is not guaranteed. Call before travelling.');$('fallbackSummary').textContent=autoLocale('Αν η αυτόματη αναζήτηση αποτύχει: επίσημες πηγές ↗','If the automatic search fails: official sources ↗');const root=$('cards');root.replaceChildren();const all=sources();loadAutomatic(date);all.forEach((s,i)=>{const card=node('article','card'+(i===0?' primary':''));card.append(node('span','tag',i===0?tr('main'):tr('secondary')));card.append(node('h3','',tr(s.name)));card.append(node('p','',tr(type==='hospital'?'hospDesc':'pharmDesc')+' '+(type==='hospital'&&$('specialty').value!=='all'?tr('specialNote'):'')+' '+tr('confirm')));const actions=node('div','actions');actions.append(link(tr('open'),s.href,i===0));card.append(actions);root.append(card)});
-const regions=$('regions');regions.replaceChildren();REG.forEach(([name,url])=>regions.append(link(name+' ↗',url,false)));updateMaps()}
-function updateMaps(){const value=$('destination').value.trim();let a=$('mapsLink');a.href=value?'https://www.google.com/maps/dir/?api=1&destination='+encodeURIComponent(value+', Greece'):'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(label()+', Greece');a.title=value?'Google Maps destination':'Google Maps area search (not proof of duty)'}
-function setCity(c){chosen=c;$('geoStatus').className='status';$('geoStatus').textContent=tr('found')+' '+(c[lang]||c.label||c.el);draw()}
-async function chooseCity(){const q=$('city').value.trim();if(!q)return;const found=CITIES.find(c=>norm(c[0])===norm(q)||norm(c[1])===norm(q));if(found){setCity({el:found[0],en:found[1],lat:found[2],lon:found[3]});return}const id=++seq;$('geoStatus').className='status';$('geoStatus').textContent=tr('searching');try{const r=await fetch('/api/places?q='+encodeURIComponent(q),{cache:'no-store'});if(!r.ok)throw new Error();const js=await r.json();if(id!==seq)return;const c=js.places?.[0];if(!c||!Number.isFinite(Number(c.lat))||!Number.isFinite(Number(c.lon)))throw new Error();setCity({el:c.label,en:c.label,lat:Number(c.lat),lon:Number(c.lon)})}catch{if(id===seq){$('geoStatus').className='status error';$('geoStatus').textContent=tr('notfound');$('city').value=label()}}}
-async function locate(){if(!isSecureContext){$('geoStatus').textContent=tr('gpsHttps');return}if(!navigator.geolocation){$('geoStatus').textContent=tr('gpsFail');return}$('locate').disabled=true;$('geoStatus').className='status';$('geoStatus').textContent=tr('locating');navigator.geolocation.getCurrentPosition(async pos=>{try{const lat=pos.coords.latitude,lon=pos.coords.longitude;if(lat<33.9||lat>42.6||lon<19||lon>30)throw new Error();let name='';try{const r=await fetch('/api/reverse?lat='+lat+'&lon='+lon);if(r.ok){const j=await r.json();name=j.place?.label||j.label||j.name||''}}catch{}const near=CITIES.map(c=>({c,km:d(lat,lon,c[2],c[3])})).sort((a,b)=>a.km-b.km)[0];const selected=name||((near.km<15)?near.c[lang==='el'?0:1]:(lang==='el'?'Τρέχουσα θέση':'Current location'));setCity({el:selected,en:selected,lat,lon});$('geoStatus').textContent=tr('approx')+' '+selected+' · ±'+Math.round(pos.coords.accuracy)+'m'}catch{$('geoStatus').className='status error';$('geoStatus').textContent=tr('gpsFail')}finally{$('locate').disabled=false}},err=>{$('geoStatus').className='status error';$('geoStatus').textContent=tr(err.code===1?'gpsDenied':'gpsFail');$('locate').disabled=false},{enableHighAccuracy:true,timeout:14000,maximumAge:60000})}
-if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then(rs=>Promise.all(rs.map(r=>r.unregister()))).catch(()=>{});}
-if(navigator.permissions?.query){navigator.permissions.query({name:'geolocation'}).then(p=>{if(p.state==='granted')locate()}).catch(()=>{});}
-$('date').value=today();$('language').onclick=()=>{lang=lang==='el'?'en':'el';localStorage.setItem('efimeria-lang',lang);draw()};$('hospital').onclick=()=>{type='hospital';draw()};$('pharmacy').onclick=()=>{type='pharmacy';draw()};$('specialty').onchange=()=>{window.oldSpecialty=$('specialty').value;draw()};$('date').onchange=draw;$('locate').onclick=locate;$('city').addEventListener('change',chooseCity);$('city').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();chooseCity()}});$('city').addEventListener('blur',()=>{if(norm($('city').value)!==norm(label()))chooseCity()});$('destination').addEventListener('input',updateMaps);draw();
-})();
-</script>
-</body></html>
+<section id="pharmacySection" class="section"><div class="section-bar"><span class="section-icon pharmacy">✳</span><div><div class="overline">02 / PHARMACY DUTY</div><h2 data-t="pharmacyTitle">Εφημερεύοντα φαρμακεία</h2><p data-t="pharmacySubtitle" class="subcaption">Στη γειτονιά σου και κοντινές περιοχές</p></div></div>
+<div id="pharmacyMeta" class="notice" aria-live="polite" data-state="loading">Αναζήτηση εφημερευόντων φαρμακείων…</div>
+<div id="pharmacies" class="results"></div>
+</section>
+<section class="explain"><div class="overline" data-t="sources">ΠΗΓΕΣ & ΑΞΙΟΠΙΣΤΙΑ</div><h3 data-t="sourceHeading">Πραγματικές καταχωρίσεις, όχι εικασίες</h3><p data-t="sourceText">Οι εφημερίες προέρχονται από δημοσιευμένα προγράμματα ή επαγγελματικούς καταλόγους. Η ένδειξη «σε ισχύ σύμφωνα με το πρόγραμμα» δεν είναι επιβεβαίωση ότι η μονάδα μπορεί να σε εξυπηρετήσει τώρα. Πάντα τηλεφώνησε πριν φύγεις.</p>
+<div class="sources"><a href="https://www.3ype.gr/category/efimeries/" target="_blank" rel="noopener noreferrer">3η ΥΠΕ ↗</a><a href="https://www.thessalonikiguide.gr/efimerevonta-nosokomeia/" target="_blank" rel="noopener noreferrer">ThessalonikiGuide ↗</a><a href="https://efimeries.fsth.gr/" target="_blank" rel="noopener noreferrer">ΦΣ Θεσσαλονίκης ↗</a><a href="https://www.xo.gr/efimerevonta-farmakeia/" target="_blank" rel="noopener noreferrer">xo.gr ↗</a></div></section>
+</main><footer>EFIMERIA ONE · v5.1 <span>●</span> GREECE / ΕΛΛΑΔΑ <p data-t="footer">Η εφαρμογή δεν υποκαθιστά το ΕΚΑΒ ή ιατρικές οδηγίες. Για πραγματικό επείγον: 112 ή 166.</p></footer></div></body></html>
