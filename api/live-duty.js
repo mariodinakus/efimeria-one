@@ -45,6 +45,15 @@ const formatHospital=(x,date,mode)=>({
  hours:x[3].includes('Δερματολογική (08:00')?'08:00–20:00':'08:00–08:00 επομένης',
  source:SOURCE_H,sourceKind:mode,liveConfirmed:false,locationApproximate:true
 });
+// Dated fallback for the 16 Oct overnight roster; these pharmacies are in central
+// Thessaloniki, NOT in Menemeni. Use only for that exact published date.
+const NIGHT_PHARMACY_16=[
+ {name:'ΦΡΑΝΤΖΗΣ ΙΑΚΩΒΟΣ',address:'Εγνατία 45, Θεσσαλονίκη (κέντρο)',phone:'2310524401',hours:'21:00–08:00',
+  date:'2026-10-16',source:'https://www.xo.gr/efimerevonta-farmakeia/thessaloniki/',sourceKind:'dated-third-party-snapshot',region:'thessaloniki-centre',liveConfirmed:false},
+ {name:'ΚΑΡΑΚΑΣΗ ΑΝΔΡΟΝΙΚΗ',address:'Βύζαντος & Βιζύης 5, Σαράντα Εκκλησιές, Θεσσαλονίκη',phone:'2310228865',hours:'21:00–08:00',
+  date:'2026-10-16',source:'https://www.xo.gr/efimerevonta-farmakeia/thessaloniki/',sourceKind:'dated-third-party-snapshot',region:'thessaloniki-centre',liveConfirmed:false}
+];
+
 const REQUEST={headers:{'Accept':'text/html','User-Agent':'EFIMERIA-ONE / published-duty-info (not an emergency service)'},signal:null};
 async function getHTML(url,ms=9500){const u=new URL(url);if(!['www.thessalonikiguide.gr','www.xo.gr'].includes(u.hostname))throw Error('Domain disallowed');
  const ctrl=new AbortController(),timer=setTimeout(()=>ctrl.abort(),ms);
@@ -163,6 +172,12 @@ export default async function handler(req,res){
  const seen=new Set();let bad=0;
  for(const r of results){if(r.status!=='fulfilled'){bad++;continue}for(const e of r.value.entries||[]){const k=norm(e.name)+'|'+norm(e.address);if(!seen.has(k)){seen.add(k);output.entries.push(e)}}}
  if(output.entries.length){output.status='published';output.source=FSTH;output.sourceLabel='xo.gr third-party listings; verify against FSTH';output.disclaimer='Third-party listed duty times, not official confirmation or real-time open status. Call before travelling.'}
- else output.status=bad===results.length?'unavailable':'no_verified_entries';
+ else if(date==='2026-10-16'&&['menemeni','west','thessaloniki','evosmos','kalamaria'].includes(region)){
+  output.entries=NIGHT_PHARMACY_16;
+  output.status='published_snapshot';
+  output.source='https://www.xo.gr/efimerevonta-farmakeia/thessaloniki/';
+  output.disclaimer='Dated 16 October 2026 overnight listings from central Thessaloniki, not nearest Menemeni pharmacies. Check before travelling.';
+}
+else output.status=bad===results.length?'unavailable':'no_verified_entries';
  return res.end(JSON.stringify(output));
 }
