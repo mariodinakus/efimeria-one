@@ -3,7 +3,7 @@ const send=(res,status,data)=>{res.statusCode=status;res.setHeader('Content-Type
 export default async function handler(req,res){
  if(req.method!=='GET')return send(res,405,{error:'Method not allowed'});
  const q=String(req.query.q||'').trim().slice(0,80);
- const lang=req.query.lang==='el'?'el':'en';
+ const lang='en'; // Public Photon demo may not expose Greek-localized names; Greek input still works.
  if(q.length<2||!/^[\p{L}\p{M}\s'.,-]+$/u.test(q))return send(res,400,{error:'Invalid location query'});
  const c=new AbortController(), timer=setTimeout(()=>c.abort(),6500);
  try{

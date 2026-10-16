@@ -1,54 +1,53 @@
-# EFIMERIA ONE
+# EFIMERIA ONE 🇬🇷 / EN
 
-A responsive, Greece-first hospital/pharmacy location finder, designed for Vercel. **Important: location discovery is not live on-duty verification.** The app provides a map of healthcare facilities from OpenStreetMap and direct links to official duty schedules. It must never be used to decide where to go in a life-threatening emergency: call 112 or 166.
+Nationwide, bilingual healthcare-location finder for Greece. Deployable static frontend and Vercel serverless functions, with **no paid API key**.
 
-## Features
+## What is included
 
-- Device geolocation (only with user consent), town/city search, 3–30 km radius.
-- Dynamic real OSM hospital/pharmacy discovery through a serverless Overpass proxy; results sorted by straight-line distance, phone (when available), one-tap directions.
-- Interactive Leaflet map with markers and navigation, mobile-friendly responsive design and dark/light modes.
-- Hospital medical-specialty selector **with clear warning that the filter is not verified**. Never treats an OSM amenity as proof of a specific duty or specialty.
-- Direct source navigation to 4th Health District (Thessaloniki), Ministry of Health, Association of Pharmacists of Thessaloniki/Attica, official national duty portal and national e-health pharmacy directory.
-- Installable PWA shell, no account / no app tracking / no third-party advertising / no API key.
-- Graceful failure when free third-party map/geocoding services are unavailable.
+- Full **Greek / English** interface toggle (top-right, choice stored in browser).
+- Nationwide city/town/village searches, Greek and Latin spelling, including Greek islands; built-in popular-city shortcuts for Athens, Thessaloniki, Patras, Heraklion, Larissa, Ioannina, Rhodes, Corfu; any other Greek location can be searched by name.
+- Consent-based geolocation, 3–30 km radius, OpenStreetMap hospital/pharmacy lookup, straight-line distance, contacts when tagged, one-tap Google Maps directions.
+- Interactive Leaflet map; responsive mobile/desktop; dark/light theme; installable PWA.
+- Medical-specialty selector **for guidance when opening the official duty schedules only** — not a verified filter or a claim that a facility is currently on duty.
+- Contextual links to the Greek Ministry of Health, 4th Regional Health Authority (Thessaloniki), Thessaloniki/Attica pharmacy associations, the national eHealth pharmacy link directory, plus links to all **seven Regional Health Authorities**.
 
-## Run locally
+## Live duty data safety
 
-Node.js >=20 required. No npm dependencies.
+**This app does NOT independently verify which hospital, emergency department, medical specialty or pharmacy is on duty at a given moment.** OpenStreetMap only lists mapped facilities and contact details, and may contain gaps or outdated locations. Links to authority schedules should be checked on the official page, matching date, specialty, place and hours. For time-sensitive severe emergencies, call **112** or **166** immediately, not the application.
 
-```bash
-npm run dev
-# open http://localhost:3000
+The coverage is **nationwide for discovering mapped facilities and looking up locations**, not a guarantee of nationwide machine-readable live rosters. Duty schedules and authoritative information are fragmented across regions; no unified, verified per-facility API has been integrated. Do not mistake map entries for an open-now status.
+
+## Deploy on Vercel
+
+1. GitHub repo: `https://github.com/mariodinakus/efimeria-one`.
+2. In Vercel click **Add New > Project > Import Git Repository** and select `efimeria-one`.
+3. Choose **Framework Preset: Other**, **Root Directory: .**. Leave the build and output directory commands blank. **Deploy**.
+4. Vercel serves root files as static assets and `api/nearby.js`, `api/places.js` as Node Functions. No API key or secrets required.
+5. Updates to `main` will trigger redeployment if the Git integration is connected.
+
+## Local testing
+
+Requires Node.js 20 or later. There are no production npm packages to install.
+
+```sh
 npm run check
+npm run dev
+# localhost:3000
 ```
 
-## GitHub → Vercel
+## Data sources
 
-1. Create an empty repository called `efimeria-one` in GitHub.
-2. Upload **all project files in the root** (not the enclosing folder).
-3. Go to Vercel > Add New > Project > import the repository.
-4. Choose Framework Preset **Other** (static HTML + Vercel `/api` Functions), Root Directory `./`, leave Build Command and Output Directory blank. Deploy.
-5. No secret env vars or API keys required.
+- Hospital duty schedules: https://www.moh.gov.gr/articles/citizen/efhmeries-nosokomeiwn/
+- Thessaloniki hospital schedules: https://www.4ype.gr/efimeries-nosokomeion/
+- All 7 Regional Health Authorities: https://www.moh.gov.gr/articles/citizen/xrhsima-thlefwna-amp-dieythynseis/2719-ygeionomikes-perifereies
+- Thessaloniki pharmacy rosters: https://efimeries.fsth.gr/
+- Attica pharmacy rosters: https://fsa-efimeries.gr/Home/
+- Regional pharmacy link directory: https://ehealthrecord.gov.gr/pharmacies
+- National roster portal: https://efimeries.gov.gr/
+- OSM / Overpass for mapped healthcare facility locations, Photon for place name search, CARTO / OpenStreetMap for base map tiles.
 
-## Data accuracy & safety
+## Privacy and limitations
 
-- `/api/nearby.js` queries Overpass / OpenStreetMap **for geographic facilities only**. `verifiedOnDuty` is always `false` by design. Results may be missing or outdated because OSM is crowdsourced; no responsibility for medical choices is implied.
-- `/api/places.js` searches Greek town names via a public Photon service. Both serverless endpoints bound query inputs and provide suitable errors. Public endpoint rate limits may apply.
-- The specialty selector does not filter unverified specialty records. It reminds the user to check the official duty program, which differs by specialty and time.
-- No location history or third-party analytics is stored by the application. Coordinates necessarily transit Vercel Functions and the third-party map provider when used; infrastructure logs may exist independently. Map tile providers may see IP addresses.
-- To display verified on-duty statuses in-app in a future release, an authoritative, licensed source with per-facility, per-specialty current duty schedules and update timestamps is needed. **Do not scrape schedules and label them verified without dependable coverage.**
-- Calls to 112 / 166 use the device's dialer; this app does not call emergency services itself.
+No login, advertising or location history collected by the app. Browser GPS requires permission. Coordinates are forwarded to Vercel Functions and external Overpass providers, and map providers may receive network metadata. Hosting and infrastructure providers may keep their own logs. All third-party services have independent availability, accuracy, quotas and usage terms.
 
-### Verified public links (as of October 2026)
-
-- Greek central duty directory: https://efimeries.gov.gr/
-- Ministry of Health hospitals: https://www.moh.gov.gr/articles/citizen/efhmeries-nosokomeiwn/
-- 4th Health District Thessaloniki schedule: https://www.4ype.gr/efimeries-nosokomeion/
-- Thessaloniki pharmacist association: https://efimeries.fsth.gr/
-- Attica pharmacist association: https://fsa-efimeries.gr/Home/
-- National e-health pharmacy directory: https://ehealthrecord.gov.gr/pharmacies
-- Gov.gr EKAB 166: https://www.gov.gr/el/sdg/healthcare/national-emergency-numbers/general/166
-
-## Tech
-
-Vanilla JavaScript, CSS, Leaflet (via UNPKG), CARTO OSM-based map tiles, Vercel Functions (ES modules), Overpass & Photon open services. No build pipeline, installation or paid API keys required.
+**Emergency UI is informational only. EFIMERIA ONE is not affiliated with Greek authorities or emergency services.**
