@@ -94,14 +94,25 @@
   request=async function(type,date,area,id){
     const result=await prevRequest(type,date,area,id);
     if(type!=='pharmacy'||result.entries?.length||date!==isoToday())return result;
-    const city=isThessArea()?'thessaloniki':/ΑΘΗΝ|ATHEN|ΠΕΙΡΑΙ|PIRAE/i.test(area)?'athens':null;
-    if(!city)return result;
+    const cities=isThessArea()?['kordelio','evosmos','thessaloniki']
+      :/ΑΘΗΝ|ATHEN|ΠΕΙΡΑΙ|PIRAE/i.test(area)?['athens']:[];
+    if(!cities.length)return result;
     try{
-      const r=await fetch('/api/pharmacies?'+new URLSearchParams({city,date}),{cache:'no-store'});
-      if(!r.ok)return result;
-      const alt=await r.json();
-      if(id!==requestId||alt.date!==date||!alt.entries?.length)return result;
-      return {...result,entries:alt.entries,status:'published',source:alt.source,sourceLabel:'iefimeria.gr (independent directory)',liveConfirmed:false};
+      const responses=await Promise.allSettled(cities.map(async city=>{
+        const r=await fetch('/api/pharmacies?'+new URLSearchParams({city,date}),{cache:'no-store'});
+        if(!r.ok)return [];
+        const data=await r.json();
+        return data.date===date&&Array.isArray(data.entries)?data.entries:[];
+      }));
+      if(id!==requestId)return result;
+      const all=[],seen=new Set();
+      for(const r of responses){if(r.status!=='fulfilled')continue;
+        for(const item of r.value){const key=norm(item.name)+'|'+norm(item.address);
+          if(seen.has(key))continue;seen.add(key);all.push(item);}
+      }
+      if(!all.length)return result;
+      return {...result,entries:all,status:'published',source:'https://www.iefimeria.gr/efimereyonta-farmakeia/',
+        sourceLabel:'iefimeria.gr (independent directory)',liveConfirmed:false};
     }catch{return result}
   };
   const prevUpdate=update;
