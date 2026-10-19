@@ -1,4 +1,4 @@
-/* EFIMERIA ONE v5.1 – list-only duty screen, Greece / bilingual.
+/* EFIMERIA ONE v5.2 – list-only duty screen, Greece / bilingual.
  * Schedules are not proof of real-time operational availability. */
 'use strict';
 const $=id=>document.getElementById(id);
@@ -110,7 +110,7 @@ function mapsURL(item){return 'https://www.google.com/maps/dir/?api=1&destinatio
 function sourcesLink(type){return type==='hospital'?'https://www.3ype.gr/category/efimeries/':'https://efimeries.fsth.gr/'}
 function isThessArea(){return selected.lat?distance(selected.lat,selected.lon,40.6401,22.9444)<55:/ΘΕΣΣ|ΜΕΝΕΜ|EVOSM|THESS/i.test(label())}
 function seed(date){if(!isThessArea()||!SEED[date])return null;return {date,status:'published_snapshot',entries:SEED[date].map(s=>({name:s[0],address:s[1],phone:s[2],specialties:s[3].split(', '),hours:'08:00–08:00 επομένης',date,source:'https://www.thessalonikiguide.gr/efimerevonta-nosokomeia/',sourceKind:'dated-source-snapshot'})),source:'https://www.thessalonikiguide.gr/efimerevonta-nosokomeia/'}}
-function save(){try{localStorage.setItem(locKey,JSON.stringify(selected))}catch{}}
+function save(){try{if(selected.isGps)localStorage.removeItem(locKey);else localStorage.setItem(locKey,JSON.stringify(selected))}catch{}}
 function msg(txt){$('message').textContent=txt||''}
 function fillLocale(){document.documentElement.lang=lang;$('language').textContent=lang==='el'?'EN':'ΕΛ';
  document.querySelectorAll('[data-t]').forEach(el=>el.textContent=t(el.dataset.t));
@@ -175,7 +175,7 @@ function renderPharmacy(){
  }
  if(entries.length){
   notice($('pharmacyMeta'),t('thirdParty')+' · '+entries.length);
-  for(const e of entries.slice(0,30))root.append(card(e,'pharmacy'));
+  for(const e of entries.slice(0,60))root.append(card(e,'pharmacy'));
  }else{
   notice($('pharmacyMeta'),t('pharmacyMissing'),'warning');
   const e=safeNode('div','empty',t('pharmacyMissing'));e.append(document.createTextNode(' '),action(t('openSource')+' ↗',sourcesLink('pharmacy')));root.append(e);
@@ -220,7 +220,7 @@ function gps(){
   let el=nearby.d<12?nearby.c[0]:'',en=nearby.d<12?nearby.c[1]:'';
   if(!el){try{const r=await fetch('/api/reverse?'+new URLSearchParams({lat,lon}));if(r.ok){const data=await r.json();el=data.label;en=data.label}}catch{}}
   if(!el){msg(t('geoOutside'));return}
-  commitArea({el,en,lat,lon});msg(t('detectedArea')+' · '+phrase('gpsAccuracy',{m:Math.round(position.coords.accuracy)}));
+  commitArea({el,en,lat,lon,isGps:true,accuracy:position.coords.accuracy});msg(t('detectedArea')+' · '+phrase('gpsAccuracy',{m:Math.round(position.coords.accuracy)}));
  },e=>{$('gps').disabled=false;msg(t(e.code===1?'gpsDenied':'gpsFail'))},{enableHighAccuracy:true,timeout:14000,maximumAge:45000})
 }
 function init(){
