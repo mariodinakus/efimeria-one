@@ -47,7 +47,7 @@ export default async function handler(req,res){
    const directions=container.find('a[href*="google.com/maps"],a[href*="maps/dir"]').first().attr('href');
    let lat=null,lon=null;
    if(directions)try{const dest=new URL(directions,url).searchParams.get('destination')||'';
-    const pos=dest.match(/^\\s*(-?\\d{1,2}\\.\\d+)\\s*,\\s*(-?\\d{1,3}\\.\\d+)\\s*$/);
+    const pos=dest.match(/^\s*(-?\d{1,2}\.\d+)\s*,\s*(-?\d{1,3}\.\d+)\s*$/);
     if(pos){const a=Number(pos[1]),b=Number(pos[2]);if(a>=34&&a<=42.6&&b>=19&&b<=30){lat=a;lon=b}}
    }catch{}
    entries.push({name,address:before,hours,phone:phoneHref.replace(/^tel:/,''),lat,lon,coordinateSource:lat!==null?'source-directions':null,
