@@ -44,7 +44,14 @@ export default async function handler(req,res){
    if(!before||before.length<6)return;
    const id=name+'|'+before;if(seen.has(id))return;seen.add(id);
    const phoneHref=container.find('a[href^="tel:"]').first().attr('href')||'';
-   entries.push({name,address:before,hours,phone:phoneHref.replace(/^tel:/,''),source:url,sourceType:'third-party-listing',verifiedLive:false,date,area:city});
+   const directions=container.find('a[href*="google.com/maps"],a[href*="maps/dir"]').first().attr('href');
+   let lat=null,lon=null;
+   if(directions)try{const dest=new URL(directions,url).searchParams.get('destination')||'';
+    const pos=dest.match(/^\\s*(-?\\d{1,2}\\.\\d+)\\s*,\\s*(-?\\d{1,3}\\.\\d+)\\s*$/);
+    if(pos){const a=Number(pos[1]),b=Number(pos[2]);if(a>=34&&a<=42.6&&b>=19&&b<=30){lat=a;lon=b}}
+   }catch{}
+   entries.push({name,address:before,hours,phone:phoneHref.replace(/^tel:/,''),lat,lon,coordinateSource:lat!==null?'source-directions':null,
+    source:url,sourceType:'third-party-listing',verifiedLive:false,date,area:city});
   });
   if(!entries.length)return respond(res,200,{coverage:true,status:'parse_unavailable',entries:[],date,source:url});
   return respond(res,200,{coverage:true,status:'reported',entries:entries.slice(0,120),date,source:url,extractedAt:new Date().toISOString(),notice:'Independent site reports on-duty listings. Not official and not confirmed currently open. Call before travelling.'})
