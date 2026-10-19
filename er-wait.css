@@ -1,0 +1,19 @@
+
+/* Published hospital ED wait-time panels */
+.er-panel{margin-top:14px;padding:13px;background:#111e24;border:1px solid #38564e;border-radius:12px}
+.er-no-data{background:#1a2228;border-color:#344047}
+.er-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12px;color:#daf6e8}
+.er-refresh{font-size:11px;padding:5px 8px;border-radius:7px;background:#234639;color:#bff6d8;border:1px solid #4c7667}
+.er-note{font-size:11px;color:#b5c6c6;margin:8px 0;line-height:1.6}
+.er-live{font-size:10px;font-weight:800;color:#b8f5d8;margin:10px 0}
+.er-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin:10px 0}
+.er-stat{background:#22352f;border:1px solid #37584c;border-radius:8px;padding:8px;display:flex;flex-direction:column;gap:3px;min-width:0}
+.er-stat span{font-size:10px;color:#bdcec9}
+.er-stat strong{font-size:16px;color:#e7fff2;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.er-smalltitle{font-size:10px;letter-spacing:1.2px;color:#b3d8c8;font-weight:800;margin:14px 0 7px}
+.er-specialties{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.er-specialties .er-stat{padding:6px 8px}
+.er-specialties .er-stat strong{font-size:14px}
+.er-source{display:inline-block;font-weight:800;font-size:11px;color:#a6edcc;margin-top:10px;text-decoration:underline}
+.er-panel small.er-timestamp,.er-panel small.er-caveat{font-size:10px;color:#b0c7c1;line-height:1.6;margin-top:9px}
+@media(max-width:440px){.er-specialties{grid-template-columns:1fr}}
