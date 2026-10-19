@@ -88,11 +88,11 @@ function hospitalPage(html,date){
  return entries.slice(0,50);
 }
 const AREAS={
- menemeni:['menemeni-thessalonikis','eleftherio-kordelio-thessalonikis','ampelokipoi-thessalonikis','eyosmos-thessalonikis'],
- west:['dytiki-thessaloniki','eleftherio-kordelio-thessalonikis'],
+ menemeni:['menemeni-thessalonikis','eleftherio-kordelio-thessalonikis','dytiki-thessaloniki','thessaloniki'],
+ west:['dytiki-thessaloniki','eleftherio-kordelio-thessalonikis','thessaloniki'],
  thessaloniki:['dytiki-thessaloniki','thessaloniki'],
  kalamaria:['kalamaria-thessalonikis','thessaloniki'],
- evosmos:['eyosmos-thessalonikis','dytiki-thessaloniki'],
+ evosmos:['eyosmos-thessalonikis','dytiki-thessaloniki','thessaloniki'],
  athens:['athina','athens'],
  patras:['patra'],larissa:['larisa'],kavala:['kavala']
 };
@@ -109,38 +109,49 @@ const normalizeArea=a=>{const s=norm(a);
  return null};
 function pharmacyPage(html,date,source,region){
  const $=load(html);$('script,style,noscript').remove();
- const body=clean($('body').text());
- // The source must explicitly display the requested calendar date. Never treat old duty results as current.
  const months=['','ΙΑΝΟΥΑΡΙΟΥ','ΦΕΒΡΟΥΑΡΙΟΥ','ΜΑΡΤΙΟΥ','ΑΠΡΙΛΙΟΥ','ΜΑΙΟΥ','ΙΟΥΝΙΟΥ','ΙΟΥΛΙΟΥ','ΑΥΓΟΥΣΤΟΥ','ΣΕΠΤΕΜΒΡΙΟΥ','ΟΚΤΩΒΡΙΟΥ','ΝΟΕΜΒΡΙΟΥ','ΔΕΚΕΜΒΡΙΟΥ'];
  const [y,m,d]=date.split('-').map(Number);
  const target=norm(d+' '+months[m]+' '+y);
- const header=norm(body.slice(0,3500));
+ // Reject results whenever the publisher does not display the requested day.
+ const header=norm(clean($('body').text().slice(0,8000)));
  if(!header.includes(target))return {status:'stale',entries:[]};
  const entries=[],seen=new Set();
  $('h2,h3').each((_,h)=>{
   const name=clean($(h).text());
-  if(!name||name.length<5||name.length>130||/ΕΦΗΜΕΡ|ΠΕΡΙΟΧ|ΑΠΟΤΕΛΕΣΜΑ|ΦΙΛΤΡ/.test(norm(name)))return;
-  // Select the smallest ancestor that includes this heading, an address and its duty hours.
-  let p=$(h).parent(),card=null;
-  for(let depth=0;depth<6&&p.length;depth++,p=p.parent()){
+  if(!name||name.length<5||name.length>150||/ΕΦΗΜΕΡ|ΠΕΡΙΟΧ|ΑΠΟΤΕΛΕΣΜΑ|ΦΙΛΤΡ/.test(norm(name)))return;
+  let card=null,p=$(h).parent();
+  for(let depth=0;depth<9&&p.length;depth++,p=p.parent()){
    const txt=clean(p.text());
-   if(txt.length>1200)break;
-   if(txt.length>name.length+35&&/Εφημερεύει\s*\d{1,2}:\d\d\s*[-–]\s*\d{1,2}:\d\d/i.test(txt)){card=p;break}
+   if(txt.length>5000)break;
+   if(txt.includes(name)&&/Εφημερεύει\s*\d{1,2}:\d\d\s*[-–]\s*\d{1,2}:\d\d/i.test(txt)){card=p;break}
   }
   if(!card)return;
-  const txt=clean(card.text());
-  const full=txt.replace(name,'').trim();
-  const dt=full.match(/Εφημερεύει\s*(\d{1,2}:\d\d)\s*[-–]\s*(\d{1,2}:\d\d)/i);
-  if(!dt)return;
-  let addr=full.slice(0,full.indexOf('Εφημερεύει')).replace(/^(?:ΑΝΟΙΧΤΟ ΤΩΡΑ|ΑNOIXTO ΤΩΡΑ)\s*/i,'');
-  addr=addr.replace(/\s*\(?Δρομολόγηση\)?[\s\S]*$/i,'').replace(/\s*\(?ΔΡΟΜΟΛΟΓΗΣΗ\)?[\s\S]*$/i,'').replace(/^(?:Image:\s*Λογότυπο\s*)/i,'').slice(0,180).trim();
-  if(addr.length<5||!/[0-9]/.test(addr))return;
-  const tel=card.find('a[href^="tel:"]').first().attr('href')?.replace(/^tel:/,'').replace(/[^+\d]/g,'')||'';
+  const txt=clean(card.text()),full=txt.replace(name,'').trim();
+  const dutyIndex=full.search(/Εφημερεύει\s*\d{1,2}:\d\d/i);
+  if(dutyIndex<0)return;
+  let addr=full.slice(0,dutyIndex).replace(/^(?:ΑΝΟΙΧΤΟ ΤΩΡΑ|ΑNOIXTO ΤΩΡΑ)\s*/i,'').trim();
+  addr=addr.replace(/\s*\(?Δρομολόγηση\)?[\s\S]*$/i,'').slice(0,220).trim();
+  if(addr.length<5||!/\d/.test(addr))return;
+  const after=full.slice(dutyIndex);
+  const intervals=[...after.matchAll(/(\d{1,2}:\d\d)\s*[-–]\s*(\d{1,2}:\d\d)/g)].slice(0,2);
+  if(!intervals.length)return;
+  const hours=intervals.map(m=>m[1]+'–'+m[2]).join(' & ');
+  const phoneLink=card.find('a[href^="tel:"]').first().attr('href')||'';
+  const fallbackPhone=txt.match(/Τηλέφων(?:ο|α)\s*:?\s*(\+?30\s*)?(2\d[\d\s-]{8,15}|69\d[\d\s-]{7,14})/i);
+  const phone=(phoneLink.replace(/^tel:/,'')||(fallbackPhone?.[0]||'').replace(/^Τηλέφων(?:ο|α)\s*:?\s*/i,'')).replace(/[^+\d]/g,'').slice(0,18);
+  // xo.gr Google Maps directions give exact destination coordinates, so no paid geocoding or guesses.
+  const href=card.find('a[href*="google.com/maps"],a[href*="maps/dir"]').first().attr('href');
+  let lat=null,lon=null;
+  if(href)try{
+   const destination=new URL(href,source).searchParams.get('destination')||'';
+   const coords=destination.match(/^\s*(-?\d{1,2}\.\d+)\s*,\s*(-?\d{1,3}\.\d+)\s*$/);
+   if(coords){const a=Number(coords[1]),b=Number(coords[2]);if(a>=34&&a<=42.6&&b>=19&&b<=30){lat=a;lon=b}}
+  }catch{}
   const key=norm(name)+'|'+norm(addr);if(seen.has(key))return;seen.add(key);
-  entries.push({name,address:addr,phone:tel,hours:dt[1]+'–'+dt[2],specialties:[],date,
-    source,sourceKind:'third-party-pharmacy-directory',liveConfirmed:false,region});
+  entries.push({name,address:addr,phone,hours,lat,lon,coordinateSource:lat!==null?'source-directions':null,
+   specialties:[],date,source,sourceKind:'third-party-pharmacy-directory',liveConfirmed:false,region});
  });
- return {status:entries.length?'published':'unparsed',entries:entries.slice(0,80)};
+ return {status:entries.length?'published':'unparsed',entries:entries.slice(0,100)};
 }
 export default async function handler(req,res){
  res.setHeader('Content-Type','application/json; charset=utf-8');res.setHeader('Cache-Control','public, s-maxage=300, stale-while-revalidate=300');
@@ -168,10 +179,10 @@ export default async function handler(req,res){
  const today=todayParts.year+'-'+todayParts.month+'-'+todayParts.day;
  const previous=new Date(Date.parse(today+'T00:00:00Z')-86400000).toISOString().slice(0,10);
  if(date!==today&&date!==previous){output.status='date_unsupported';return res.end(JSON.stringify(output))}
- const urls=pages.slice(0,3).map(s=>XO+s+'/'),results=await Promise.allSettled(urls.map(u=>getHTML(u,7500).then(h=>pharmacyPage(h,date,u,region))));
+ const urls=pages.slice(0,4).map(s=>XO+s+'/'),results=await Promise.allSettled(urls.map(u=>getHTML(u,7500).then(h=>pharmacyPage(h,date,u,region))));
  const seen=new Set();let bad=0;
  for(const r of results){if(r.status!=='fulfilled'){bad++;continue}for(const e of r.value.entries||[]){const k=norm(e.name)+'|'+norm(e.address);if(!seen.has(k)){seen.add(k);output.entries.push(e)}}}
- if(output.entries.length){output.status='published';output.source=FSTH;output.sourceLabel='xo.gr third-party listings; verify against FSTH';output.disclaimer='Third-party listed duty times, not official confirmation or real-time open status. Call before travelling.'}
+ if(output.entries.length){output.status='published';output.source=output.entries[0].source;output.officialReference=FSTH;output.sourceLabel='xo.gr third-party listings; verify against FSTH';output.disclaimer='Third-party listed duty times, not official confirmation or real-time open status. Call before travelling.'}
  else if(date==='2026-10-16'&&['menemeni','west','thessaloniki','evosmos','kalamaria'].includes(region)){
   output.entries=NIGHT_PHARMACY_16;
   output.status='published_snapshot';
