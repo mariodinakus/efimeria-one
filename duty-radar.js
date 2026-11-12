@@ -60,6 +60,12 @@
       .replace(/ΜΕΣΑΝΥΧΤΑ/g,'00:00')
       .replace(/[–—−]/g,'-')
       .replace(/ΕΩΣ/g,'-').replace(/ΒΡΑΔΥ|ΠΡΩΪ|ΠΡΩΙ|ΠΡΩΊ/g,' ');
+    // When a single specialty has a narrower published time window, honor it
+    // rather than inheriting the hospital's generic 08:00-08:00 shift.
+    if(item.type==='hospital' && Array.isArray(item.specialties) && item.specialties.length===1){
+      const specified=String(item.specialties[0]).match(/\(\s*(\d{1,2}:\d{2})\s*[-–]\s*(\d{1,2}:\d{2})\s*\)/);
+      if(specified)h=specified[1]+'-'+specified[2];
+    }
     const ranges=[];
     const rx=/(\d{1,2}):(\d{2})\s*(?:-|TO)\s*(\d{1,2}):(\d{2})/g;
     for(const m of h.matchAll(rx)){
