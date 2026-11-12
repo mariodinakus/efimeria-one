@@ -66,3 +66,6 @@
 #geoRadar .radar-popup a{font-size:11px;margin:5px 9px 0 0;display:inline-block}
 @media(max-width:850px){#geoRadar .radar-layout{grid-template-columns:1fr}#geoRadar #dutyMap{height:350px}#geoRadar .radar-side{display:grid;grid-template-columns:1fr 1fr}#geoRadar .radar-panel{min-width:0}}
 @media(max-width:600px){#geoRadar{padding:15px;margin:18px 0;border-radius:13px}#geoRadar .radar-stats{gap:6px}#geoRadar .radar-stat{padding:10px}#geoRadar .radar-stat strong{font-size:21px}#geoRadar .radar-stat span{font-size:10px}#geoRadar .radar-side{grid-template-columns:1fr}#geoRadar #dutyMap{height:310px}#geoRadar .radar-chart{gap:1px}#geoRadar .radar-bin>span{font-size:8px}}
+
+#geoRadar .radar-pin.ended{opacity:.52;filter:grayscale(.45)}
+#geoRadar .radar-pin.later{border-style:dashed}
