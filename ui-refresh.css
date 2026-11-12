@@ -235,7 +235,7 @@ footer{color:#849ba7;border-color:#33424e}
   min-width:0!important;width:100%;max-width:100%;
 }
 #geoRadar .radar-map-shell{box-sizing:border-box}
-#geoRadar #dutyMap{display:block;position:relative;overflow:hidden;touch-action:pan-x pan-y}
+#geoRadar #dutyMap{display:block;position:relative;overflow:hidden}
 #geoRadar #dutyMap.map-night .leaflet-tile-pane{filter:none!important}
 #geoRadar #dutyMap .leaflet-pane,
 #geoRadar #dutyMap .leaflet-map-pane{max-width:none;max-height:none}
