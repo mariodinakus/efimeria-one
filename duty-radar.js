@@ -6,7 +6,7 @@
   const byId=id=>document.getElementById(id);
   const W={
     el:{
-      title:'Χάρτης & κινητικότητα εφημεριών',subtitle:'Πού βρίσκονται οι υπηρεσίες σε σχέση με εσένα και πώς αλλάζει το δημοσιευμένο ωράριο.',
+      title:'Χάρτης εφημεριών',subtitle:'Οι δομές της επιλεγμένης περιοχής, οι αποστάσεις τους και το δημοσιευμένο ωράριό τους.',
       all:'Όλα',hosp:'Νοσοκομεία',pharm:'Φαρμακεία',gps:'GPS · Η θέση μου',area:'Κέντρο επιλεγμένης περιοχής',
       active:'Σε εφημερία βάσει ωραρίου',later:'Αρχίζουν αργότερα',mapped:'Σημεία στον χάρτη',dated:'Καταχωρίσεις ημερομηνίας',withHours:'Με γνωστό ωράριο',
       next:'Οι κοντινότερες επιλογές',now:'Σε ισχύ βάσει ωραρίου',soon:'Αργότερα',ended:'Εκτός δηλωμένου ωραρίου',
@@ -18,11 +18,11 @@
       live:'Δημόσια ζωντανή αναμονή ΤΕΠ',liveNo:'Δεν υπάρχουν διαθέσιμα επαληθευμένα live δεδομένα αναμονής αυτή τη στιγμή.',
       liveWait:'Περιμένουν γιατρό',liveTriage:'Περιμένουν διαλογή',liveAverage:'Μέση αναμονή',liveUpdate:'Ενημέρωση πηγής',
       history:'Μεταβολή από προηγούμενη καταγραφή',historyNote:'Ιστορικό μόνο των πραγματικών μετρήσεων που κατέγραψε αυτός ο browser.',
-      minutes:'λεπτά',fit:'Όλα τα σημεία',expand:'Πλήρης οθόνη',collapse:'Κλείσιμο πλήρους οθόνης',noGps:'Η ένδειξη απόστασης υπολογίζεται από την επιλεγμένη περιοχή, όχι από το GPS σου.',
+      minutes:'λεπτά',fit:'Όλα τα σημεία',expand:'Πλήρης οθόνη',collapse:'Έξοδος',night:'Νύχτα',street:'Δρόμοι',sites:'σημεία στον χάρτη',hospitalLabel:'Νοσοκομείο',pharmacyLabel:'Φαρμακείο',noGps:'Η ένδειξη απόστασης υπολογίζεται από την επιλεγμένη περιοχή, όχι από το GPS σου.',
       noCapacity:'Η συχνότητα εφημεριών δεν δείχνει κίνηση ασθενών. Η διαλογή προηγείται της σειράς άφιξης.'
     },
     en:{
-      title:'Duty map & activity',subtitle:'See facilities relative to your location and how published duty hours change.',
+      title:'Duty map',subtitle:'Facilities in the selected area, their distances and published duty hours.',
       all:'All',hosp:'Hospitals',pharm:'Pharmacies',gps:'GPS · My location',area:'Selected area centre',
       active:'Scheduled as on duty',later:'Starting later',mapped:'Mapped locations',dated:'Dated entries',withHours:'Known duty hours',
       next:'Closest facilities',now:'On duty by schedule',soon:'Later',ended:'Outside published hours',
@@ -34,7 +34,7 @@
       live:'Verified public ED queue',liveNo:'Verified live wait-time data are currently unavailable.',
       liveWait:'Waiting for doctor',liveTriage:'Waiting for triage',liveAverage:'Average wait',liveUpdate:'Source updated',
       history:'Change since previous observation',historyNote:'History consists only of real observations collected in this browser.',
-      minutes:'minutes',fit:'Show all points',expand:'Fullscreen',collapse:'Exit fullscreen',noGps:'Distances use the selected area centre, not your exact GPS position.',
+      minutes:'minutes',fit:'Show all points',expand:'Fullscreen',collapse:'Exit fullscreen',night:'Night',street:'Streets',sites:'mapped sites',hospitalLabel:'Hospital',pharmacyLabel:'Pharmacy',noGps:'Distances use the selected area centre, not your exact GPS position.',
       noCapacity:'Duty coverage is not patient traffic. Medical triage determines priority.'
     }
   };
@@ -87,6 +87,15 @@
     return 'ended';
   }
   let filter='all',map=null,markersLayer=null,selfMarker=null,markerMap=new Map(),cameraKey='',lastLocation='',mapResizeObserver=null;
+  let mapMode='night';
+  try{mapMode=localStorage.getItem('efimeria-map-style')==='street'?'street':'night';}catch{}
+  function applyMapStyle(){
+    const el=byId('dutyMap');
+    el.classList.toggle('map-night',mapMode==='night');
+    for(const [key,id] of [['night','radarModeNight'],['street','radarModeStreet']]){
+      const b=byId(id);b.setAttribute('aria-pressed',String(mapMode===key));
+    }
+  }
   let liveData=null,lastLiveAt=0,working=false;
   const historyKey='efimeria-public-queue-history-v1';
   let history=[];
@@ -122,6 +131,10 @@
     for(const k of ['all','hosp','pharm'])byId('radarFilter-'+k).textContent=tr(k);
     byId('radarGps').textContent=tr('gps');
     byId('radarFit').textContent=tr('fit');
+    byId('radarModeNight').textContent=tr('night');
+    byId('radarModeStreet').textContent=tr('street');
+    byId('radarLegendHosp').textContent=tr('hosp');
+    byId('radarLegendPharm').textContent=tr('pharm');
     byId('radarExpand').textContent=tr(byId('dutyMap').closest('.radar-map-shell').classList.contains('is-expanded')?'collapse':'expand');
     byId('radarOrigin').textContent=(selected.isGps?tr('gps'):tr('area'))+' · '+(selected[isEnglish()?'en':'el']||selected.el);
     byId('radarDisclaimer').textContent=tr('noCapacity')+' '+(selected.isGps?'':tr('noGps'));
@@ -139,6 +152,7 @@
     const base=selectedDate(),now=items.filter(p=>phase(p,base)==='now').length;
     const later=items.filter(p=>phase(p,base)==='later').length;
     const mapped=items.filter(valid).length;
+    byId('radarMapCount').textContent=mapped+' '+tr('sites');
     const entries=customDate?
       [{v:items.length,l:tr('dated')},{v:items.filter(p=>intervals(p).length>0).length,l:tr('withHours')},{v:mapped,l:tr('mapped')}]:
       [{v:now,l:tr('active')},{v:later,l:tr('later')},{v:mapped,l:tr('mapped')}];
@@ -177,6 +191,7 @@
   }
   function popupContent(p){
     const e=mk('div','radar-popup');
+    e.append(mk('span','radar-popup-label',tr(p.type==='hospital'?'hospitalLabel':'pharmacyLabel')));
     e.append(mk('strong','',p.name||'?'));
     if(p.address)e.append(mk('p','',p.address));
     const when=mk('div','radar-popup-meta',tr(phase(p,selectedDate())==='now'?'now':phase(p,selectedDate())==='later'?'soon':phase(p,selectedDate())==='ended'?'ended':'unknown')+' · '+prettyDist(p));
@@ -186,7 +201,11 @@
     return e;
   }
   function markerIcon(p){
-    return L.divIcon({className:'radar-map-icon',html:'<span class="radar-pin '+(p.type==='hospital'?'hospital':'pharmacy')+' '+phase(p,selectedDate())+'">'+(p.type==='hospital'?'+':'✦')+'</span>',iconSize:[27,34],iconAnchor:[13,33],popupAnchor:[0,-27]});
+    const hospital=p.type==='hospital';
+    const glyph=hospital
+      ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 3h5v6.5H21v5h-6.5V21h-5v-6.5H3v-5h6.5z" fill="currentColor"/></svg>'
+      : '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="8.5" width="17" height="7" rx="3.5" transform="rotate(-45 12 12)" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M9.5 9.5l5 5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>';
+    return L.divIcon({className:'radar-map-icon',html:'<span class="radar-pin '+(hospital?'hospital':'pharmacy')+' '+phase(p,selectedDate())+'">'+glyph+'</span>',iconSize:[40,40],iconAnchor:[20,20],popupAnchor:[0,-25]});
   }
   function fitMap(items,force=false){
     if(!map||!valid(selected))return;
@@ -210,12 +229,14 @@
     if(!valid(selected))return;
     if(!window.L){container.replaceChildren(mk('div','radar-map-error',tr('mapFail')));return;}
     if(!map){
-      map=L.map(container,{zoomControl:true,scrollWheelZoom:false,preferCanvas:true,attributionControl:true})
+      map=L.map(container,{zoomControl:false,scrollWheelZoom:false,preferCanvas:true,attributionControl:true})
         .setView(coord(selected),12);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+      L.control.zoom({position:'bottomright'}).addTo(map);
+      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
         attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-        maxZoom:18
+        maxZoom:19
       }).addTo(map);
+      applyMapStyle();
       markersLayer=L.layerGroup().addTo(map);
       if('ResizeObserver' in window){
         mapResizeObserver=new ResizeObserver(()=>refreshMapBounds());
@@ -225,7 +246,7 @@
     markersLayer.clearLayers();markerMap.clear();
     if(selfMarker)map.removeLayer(selfMarker);
     selfMarker=L.circleMarker(coord(selected),{
-      radius:9,color:'#fff',weight:3,fillColor:'#248af6',fillOpacity:1
+      radius:selected.isGps?8:7,color:'#f1f7f8',weight:2.5,fillColor:selected.isGps?'#7facf1':'#7ac5b5',fillOpacity:1
     }).addTo(map).bindPopup(selected.isGps?tr('gps'):tr('area'));
     for(const p of items){
       if(!valid(p))continue;
@@ -328,6 +349,14 @@
     }
     byId('radarGps').onclick=()=>byId('gps')?.click();
     byId('radarFit').onclick=()=>refreshMapBounds(true);
+    for(const [mode,id] of [['night','radarModeNight'],['street','radarModeStreet']]){
+      byId(id).onclick=()=>{
+        mapMode=mode;
+        applyMapStyle();
+        try{localStorage.setItem('efimeria-map-style',mode)}catch{}
+      };
+    }
+    applyMapStyle();
     const mapShell=byId('dutyMap').closest('.radar-map-shell'),expand=byId('radarExpand');
     expand.onclick=()=>{
       const full=mapShell.classList.toggle('is-expanded');

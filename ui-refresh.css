@@ -1,0 +1,225 @@
+
+/* EFIMERIA ONE — refined graphite / sea-glass UI, 2026. */
+:root{
+  --bg:#0b1118;--panel:#161f29;--border:#2c3a46;--muted:#9eb0bd;
+  --white:#eef5f6;--mint:#91d1bf;--yellow:#f0c897;--red:#e6a399;--ink:#12232b;
+  font-family:Inter,"Segoe UI",ui-sans-serif,system-ui,-apple-system,sans-serif;
+}
+html{background:#0b1118}
+body{
+  background:radial-gradient(ellipse 800px 450px at 18% -10%,rgba(67,116,132,.16),transparent 77%),
+    radial-gradient(ellipse 700px 480px at 100% 16%,rgba(51,105,98,.11),transparent 74%),#0b1118;
+  color:var(--white);letter-spacing:-.008em;min-width:320px;
+}
+.app{max-width:1210px;padding:0 30px 64px}
+header{padding:22px 0 23px;border-color:#2a3742}
+.logo{font-size:25px;letter-spacing:-1.25px;color:#f2f9f9}
+.mark{width:37px;height:37px;border-radius:12px;background:#9bd8ca;color:#102127;font-size:22px;box-shadow:0 8px 26px #8fbeb619}
+.logo small{font-size:9px;letter-spacing:2px}
+.mint,.eyebrow,.overline{color:#94cfc1}
+.ghost,.sos{border:1px solid #344550;background:#1a2731;color:#ddebed;box-shadow:none;border-radius:11px}
+.sos{background:#33272c;border-color:#634448;color:#f0c0b9}
+.sos b{color:#ffe6e0}
+.top-title{padding:53px 0 25px}
+.top-title h1{font-size:clamp(38px,5.2vw,63px);letter-spacing:-2.5px;line-height:1.1;max-width:920px;font-weight:780}
+.top-title h1 em{color:#a0d8ca}
+.top-title p{font-size:14px;color:#adbfc8;line-height:1.75;max-width:790px}
+.alert{background:#292126;border-color:#513a40;border-radius:13px;padding:13px 17px;margin:6px 0 21px}
+.alert-icon{background:#4c3034;color:#f3bbb2}
+.alert p{color:#dfc4c1}
+.finder{background:linear-gradient(115deg,rgba(25,43,49,.96),rgba(20,29,40,.98));border:1px solid #3a5059;border-radius:19px;padding:27px 29px;box-shadow:0 18px 48px #00000014}
+.question h2{font-size:clamp(20px,3vw,26px);letter-spacing:-.7px}
+.question p{color:#9db2bb}
+.pin{color:#92cfc5;font-size:30px}
+.area-actions{margin-top:18px}
+.btn,.choice,.action{transition:background .16s,border-color .16s,transform .16s}
+.btn{border-radius:11px;padding:12px 16px;min-height:43px}
+.btn.primary,.action.main{background:#9bd8ca;color:#14252b;border-color:#9bd8ca}
+.btn.primary:hover,.action.main:hover{background:#c0eee1}
+.btn.outline{background:#1d2b35;border-color:#3c5260;color:#e4eef0}
+.btn.outline:hover{background:#273b46;border-color:#79adad}
+input,select{background:#111c26;color:#edf4f6;border:1px solid #3c5260;border-radius:11px}
+.controls{margin:23px 0 8px}
+.choice{background:#17212b;border-color:#354551;color:#a6b6c2;padding:12px 16px;border-radius:11px}
+.choice.active{background:#203c3f;border-color:#54867f;color:#d9fff3}
+.section{margin:43px 0 52px}
+.section-bar{border-color:#33424e;margin-bottom:19px}
+.section-bar h2{font-size:clamp(23px,3vw,29px);letter-spacing:-.9px}
+.section-icon{width:45px;height:45px;border-radius:13px}
+.section-icon.hospital{background:#463238;color:#edb2a9}
+.section-icon.pharmacy{background:#244247;color:#a5d5db}
+.notice{border-color:#354851;background:#182630;color:#c0d4d7;border-radius:12px}
+.notice[data-state=warning]{background:#302a28;color:#edc9a7;border-color:#625146}
+.results{gap:15px}
+.result{border-color:#31404d;background:linear-gradient(160deg,#1a2530,#141d27);border-radius:17px;padding:21px;box-shadow:0 10px 32px #00000014}
+.result.featured{border-color:#507b76;background:linear-gradient(140deg,#1b3436,#17232c)}
+.result .label{color:#98d9ca;letter-spacing:.1em;font-weight:780}
+.result h3{color:#f3f8fa;font-size:19px;letter-spacing:-.4px}
+.result .addr{color:#a7bcc4}
+.result .tag{background:#263641;color:#cbdce1;border:1px solid #314550}
+.result .action{border:1px solid #3b5360;background:#22323d;color:#e4f1f2;border-radius:11px}
+.result .action.main{background:#9bd8ca;color:#13262a;border-color:#9bd8ca}
+.result .distance-info{background:#203b39;border-color:#3f6964}
+.result .distance-info strong{color:#b2e7d8}
+.explain{border-color:#344450}
+.explain p{color:#a7b8c3}
+.sources a{background:#1c2b34;border:1px solid #3d5360;border-radius:10px}
+footer{color:#849ba7;border-color:#33424e}
+
+/* Dedicated dashboard section */
+#geoRadar{
+  position:relative;isolation:isolate;overflow:visible;
+  margin:25px 0 39px;padding:28px;
+  background:linear-gradient(155deg,#17232e,#111b25 65%);
+  border:1px solid #354754;border-radius:22px;color:#edf5f6;
+  box-shadow:0 16px 54px #0000001c;
+}
+#geoRadar h2{font-size:clamp(25px,3.3vw,35px);font-weight:780;letter-spacing:-1.25px}
+#geoRadar .radar-eyebrow{font-size:10px;color:#93cfc2;letter-spacing:.19em}
+#geoRadar .radar-subtitle{max-width:800px;color:#9eb6bf;line-height:1.65}
+#geoRadar .radar-header{gap:16px}
+#geoRadar .radar-filters{padding:4px;border:1px solid #364b55;background:#101c27;border-radius:13px;gap:4px}
+#geoRadar .radar-filters button{border:0;border-radius:9px;background:transparent;color:#a8bac4;padding:10px 13px;font-weight:650}
+#geoRadar .radar-filters button[aria-pressed=true]{background:#a3dcce;color:#15292d;box-shadow:0 3px 12px #9ad4c721}
+#geoRadar .radar-origin-row{margin:19px 0 17px}
+#geoRadar .radar-origin{font-size:12px;color:#becfd3}
+#geoRadar .radar-gps{background:#1d303a;border:1px solid #425a63;color:#deeeee;border-radius:10px;font-size:11px}
+#geoRadar .radar-gps:hover{border-color:#8ac4b9}
+#geoRadar .radar-stats{gap:12px;margin:14px 0 19px}
+#geoRadar .radar-stat{background:#192c36;border:1px solid #304752;border-radius:14px;padding:16px 18px;gap:5px}
+#geoRadar .radar-stat strong{color:#f5fbfb;font-size:clamp(23px,3vw,30px);letter-spacing:-.8px}
+#geoRadar .radar-stat span{font-size:11px;color:#aac0c6}
+#geoRadar .radar-map-shell{overflow:hidden;background:#111b23;border:1px solid #3b5560;border-radius:17px;box-shadow:0 18px 40px #0005}
+#geoRadar #dutyMap{height:clamp(480px,61vh,710px);background:#111a22;z-index:0}
+#geoRadar #dutyMap .leaflet-tile-pane{transition:filter .28s ease}
+#geoRadar #dutyMap.map-night .leaflet-tile-pane{
+  filter:grayscale(.90) invert(.94) hue-rotate(180deg) brightness(.73) contrast(1.07);
+}
+#geoRadar #dutyMap .leaflet-container{background:#131f28}
+#geoRadar #dutyMap .leaflet-control-attribution{
+  background:#12232edb!important;color:#a5b7bc!important;font-size:9px!important;
+  border-radius:8px 0 0 0;padding:3px 7px;
+}
+#geoRadar #dutyMap .leaflet-control-attribution a{color:#c0dfdb}
+#geoRadar #dutyMap .leaflet-control-zoom{border:none;box-shadow:0 7px 25px #0005;margin-bottom:35px;margin-right:13px}
+#geoRadar #dutyMap .leaflet-control-zoom a{
+  width:35px;height:35px;line-height:33px;background:#1a2b36;color:#e4eff1;
+  border:1px solid #3b5661;font-size:20px;
+}
+#geoRadar #dutyMap .leaflet-control-zoom a:first-child{border-radius:10px 10px 0 0}
+#geoRadar #dutyMap .leaflet-control-zoom a:last-child{border-radius:0 0 10px 10px}
+#geoRadar #dutyMap .leaflet-control-zoom a:hover{background:#28414b}
+#geoRadar .radar-map-tools{
+  top:15px;right:15px;left:auto;gap:8px;z-index:1001;max-width:calc(100% - 30px);
+}
+#geoRadar .radar-map-tools button{
+  background:#172733ed;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border:1px solid #445d66;color:#e6eff0;min-height:37px;
+  font-weight:650;border-radius:10px;padding:9px 12px;box-shadow:0 5px 22px #0004;
+}
+#geoRadar .radar-map-style{display:flex;gap:2px;padding:3px;background:#14232deb;border:1px solid #445d66;border-radius:12px}
+#geoRadar .radar-map-style button{background:transparent;border-color:transparent;box-shadow:none;min-height:31px;padding:7px 10px}
+#geoRadar .radar-map-style button[aria-pressed=true]{background:#9fd8ca;color:#14272b;border-color:#9fd8ca}
+#geoRadar .radar-map-tools>button:hover{background:#263f49;border-color:#8bbdb7}
+#geoRadar .radar-map-summary{
+  position:absolute;left:15px;top:15px;z-index:790;
+  display:flex;align-items:center;gap:9px;
+  background:#172733ed;border:1px solid #425b64;backdrop-filter:blur(12px);
+  color:#dfeef0;border-radius:11px;padding:10px 12px;font-size:11px;font-weight:700;
+  max-width:calc(100% - 30px);
+}
+#geoRadar .radar-live-dot{width:7px;height:7px;border-radius:50%;background:#92d9bf;box-shadow:0 0 0 4px #89c7bb26;flex:none}
+#geoRadar .radar-map-legend{
+  position:absolute;left:15px;bottom:17px;z-index:790;
+  display:flex;gap:16px;flex-wrap:wrap;
+  background:#162733eb;border:1px solid #45606a;border-radius:11px;
+  padding:11px 13px;backdrop-filter:blur(14px);font-size:11px;color:#e1edef;
+}
+#geoRadar .radar-map-legend span{display:flex;align-items:center;gap:7px}
+#geoRadar .radar-map-legend b{font-weight:650}
+#geoRadar .radar-map-legend i{width:10px;height:10px;border-radius:4px;display:inline-block;background:#f2aa9f}
+#geoRadar .radar-map-legend .legend-pharmacy i{background:#91cee2}
+#geoRadar .radar-map-icon{background:transparent!important;border:0!important}
+#geoRadar .radar-pin{
+  height:38px;width:38px;border-radius:12px;border:2px solid #edf8fa;
+  display:flex;align-items:center;justify-content:center;color:#10242c;
+  box-shadow:0 2px 0 #10212b,0 5px 13px #0007;
+  transition:transform .18s ease,opacity .15s;
+}
+#geoRadar .radar-pin svg{height:19px;width:19px;display:block}
+#geoRadar .radar-pin.hospital{background:#f2aa9f}
+#geoRadar .radar-pin.pharmacy{background:#91cee2}
+#geoRadar .radar-pin.ended{opacity:.58;filter:grayscale(.3)}
+#geoRadar .radar-pin.later{border-style:dashed}
+#geoRadar .radar-map-icon:hover .radar-pin{transform:translateY(-3px)}
+#geoRadar .radar-popup{min-width:190px;max-width:245px;color:#e5f0f1}
+#geoRadar .radar-popup-label{font-size:10px;font-weight:750;letter-spacing:.08em;text-transform:uppercase;color:#8fcfc2;display:block;margin-bottom:7px}
+#geoRadar .radar-popup strong{font-size:15px;color:#f6fafb;line-height:1.3;display:block}
+#geoRadar .radar-popup p{color:#b9cbd0;line-height:1.5;font-size:12px}
+#geoRadar .radar-popup-meta{font-size:11px;color:#d8e7e9;border-top:1px solid #39515b;padding-top:8px}
+#geoRadar .radar-popup a{display:inline-block;background:#9ed8cc;color:#132a30;text-decoration:none;font-weight:750;padding:8px 10px;border-radius:8px;margin:9px 6px 0 0}
+#geoRadar .leaflet-popup-content-wrapper{background:#172833;color:#f1f6f7;border:1px solid #506772;border-radius:14px;box-shadow:0 15px 38px #0008}
+#geoRadar .leaflet-popup-content{margin:15px}
+#geoRadar .leaflet-popup-tip{background:#172833}
+#geoRadar .leaflet-popup-close-button{color:#c1d2d7!important}
+#geoRadar .radar-side{gap:15px}
+#geoRadar .radar-panel,#geoRadar .radar-chart-wrap{
+  background:#172630;border:1px solid #314953;border-radius:15px;padding:18px;
+}
+#geoRadar .radar-panel h3,#geoRadar .radar-chart-wrap h3{color:#f2f7f8;font-size:15px;font-weight:750}
+#geoRadar .radar-nearby{max-height:306px}
+#geoRadar .radar-nearby-item{padding:12px 0;border-top:1px solid #314650;gap:12px}
+#geoRadar .radar-nearby-main strong{font-size:12px;color:#ebf4f5}
+#geoRadar .radar-nearby-main small{font-size:11px;color:#b0c1c9}
+#geoRadar .radar-nearby-actions a,#geoRadar .radar-focus{
+  border:1px solid #425d67;background:#213844;color:#e3eff0;border-radius:8px;padding:7px 10px;font-size:11px;
+}
+#geoRadar .radar-live-cell{background:#11212c;border-color:#354d59;border-radius:10px;padding:11px 9px}
+#geoRadar .radar-live-cell strong{color:#f4f9f9}
+#geoRadar .radar-chart-wrap{padding:20px;margin-top:15px}
+#geoRadar .radar-bin.current{background:#284248}
+#geoRadar .radar-bar.hospital,#geoRadar .radar-key::before{background:#e3a398}
+#geoRadar .radar-bar.pharmacy,#geoRadar .radar-key.pharmacy::before{background:#93cfe1}
+#geoRadar #radarSource{color:#93a9b2}
+@media(max-width:900px){
+ .app{padding:0 22px 50px}
+ #geoRadar{padding:20px}
+ #geoRadar .radar-map-summary{top:70px}
+}
+@media(max-width:680px){
+ .app{padding:0 14px 36px}
+ header{padding:17px 0}
+ .logo{font-size:21px}
+ .top-title{padding:36px 0 21px}
+ .top-title h1{font-size:clamp(34px,9vw,45px);letter-spacing:-1.8px}
+ .finder{padding:19px 16px}
+ .area-actions{gap:8px}
+ .btn{padding:11px 12px}
+ #geoRadar{padding:17px 12px;border-radius:16px;margin:19px 0 35px}
+ #geoRadar .radar-header{align-items:stretch}
+ #geoRadar .radar-filters{width:100%;justify-content:space-between}
+ #geoRadar .radar-filters button{flex:1;padding:10px 6px;font-size:11px}
+ #geoRadar .radar-stat{padding:13px 11px}
+ #geoRadar .radar-stat strong{font-size:23px}
+ #geoRadar .radar-stat span{font-size:10px}
+ #geoRadar #dutyMap{height:clamp(480px,69vh,640px)}
+ #geoRadar .radar-map-shell{border-radius:13px}
+ #geoRadar .radar-map-tools{left:9px;right:9px;top:9px;max-width:none;gap:5px;flex-wrap:nowrap}
+ #geoRadar .radar-map-style{flex:1;justify-content:center;gap:0}
+ #geoRadar .radar-map-style button{flex:1;padding:7px 5px;white-space:nowrap;font-size:10px}
+ #geoRadar .radar-map-tools>button{padding:7px 8px;font-size:10px;white-space:nowrap;min-height:38px}
+ #geoRadar .radar-map-summary{top:60px;left:9px;font-size:10px;padding:8px 10px}
+ #geoRadar .radar-map-legend{left:9px;bottom:12px;padding:9px 10px;gap:12px;font-size:10px}
+ #geoRadar .radar-side{grid-template-columns:1fr}
+ #geoRadar .radar-panel{padding:16px}
+ #geoRadar .radar-chart-wrap{padding:16px 10px}
+ #geoRadar .radar-map-shell.is-expanded{inset:5px}
+ #geoRadar .radar-map-shell.is-expanded #dutyMap{height:100%}
+ #geoRadar .radar-map-shell.is-expanded .radar-map-tools{top:11px}
+}
+@media(max-width:390px){
+ #geoRadar .radar-map-tools>button{font-size:9px;padding:7px 6px}
+ #geoRadar .radar-map-style button{font-size:9px}
+ #geoRadar .radar-map-legend{gap:8px}
+}
+@media(prefers-reduced-motion:reduce){#geoRadar .radar-pin,#geoRadar #dutyMap .leaflet-tile-pane{transition:none}}
