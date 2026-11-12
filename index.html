@@ -25,7 +25,7 @@
 </section>
 <div class="controls"><div class="date-controls"><button id="nowTab" class="choice active" type="button" data-t="now">Τρέχουσα εφημερία</button><button id="dayTab" class="choice" type="button" data-t="chooseDate">Επιλογή ημερομηνίας</button></div><div id="pickerWrap" hidden><label for="date" data-t="dutyDate">Ημερομηνία</label><input type="date" id="date"></div></div>
 <section id="geoRadar" aria-label="Duty map and activity">
-  <div class="radar-header"><div><div class="radar-eyebrow">03 / DUTY RADAR</div><h2 id="radarTitle">Χάρτης & κινητικότητα εφημεριών</h2><p class="radar-subtitle" id="radarSubtitle"></p></div>
+  <div class="radar-header"><div><div class="radar-eyebrow">01 / DUTY RADAR</div><h2 id="radarTitle">Χάρτης & κινητικότητα εφημεριών</h2><p class="radar-subtitle" id="radarSubtitle"></p></div>
     <div class="radar-filters" role="group" aria-label="Filter facilities">
       <button id="radarFilter-all" type="button" aria-pressed="true">Όλα</button>
       <button id="radarFilter-hosp" type="button" aria-pressed="false">Νοσοκομεία</button>
@@ -42,13 +42,13 @@
   <p class="radar-disclaimer" id="radarDisclaimer"></p><p id="radarSource"></p>
 </section>
 <section id="hospitalSection" class="section">
-<div class="section-bar"><span class="section-icon hospital">✚</span><div><div class="overline">01 / HOSPITAL DUTY</div><h2 data-t="hospitalTitle">Εφημερεύοντα νοσοκομεία</h2><p id="hospitalSubtitle" class="subcaption"></p></div></div>
+<div class="section-bar"><span class="section-icon hospital">✚</span><div><div class="overline">02 / HOSPITAL DUTY</div><h2 data-t="hospitalTitle">Εφημερεύοντα νοσοκομεία</h2><p id="hospitalSubtitle" class="subcaption"></p></div></div>
 <div class="specialty"><label for="specialty" data-t="specialty">Φίλτρο ειδικότητας</label><select id="specialty"></select></div>
 <div id="hospitalMeta" class="notice" aria-live="polite" data-state="loading">Αναζήτηση δημοσιευμένων εφημεριών…</div>
 <div id="hospitals" class="results"></div>
 <div id="nextWrap" class="next-wrap" hidden><div class="next-head"><h3 id="nextTitle">Επόμενη αλλαγή εφημερίας</h3><span id="nextTime"></span></div><div id="nextResults" class="results"></div></div>
 </section>
-<section id="pharmacySection" class="section"><div class="section-bar"><span class="section-icon pharmacy">✳</span><div><div class="overline">02 / PHARMACY DUTY</div><h2 data-t="pharmacyTitle">Εφημερεύοντα φαρμακεία</h2><p data-t="pharmacySubtitle" class="subcaption">Στη γειτονιά σου και κοντινές περιοχές</p></div></div>
+<section id="pharmacySection" class="section"><div class="section-bar"><span class="section-icon pharmacy">✳</span><div><div class="overline">03 / PHARMACY DUTY</div><h2 data-t="pharmacyTitle">Εφημερεύοντα φαρμακεία</h2><p data-t="pharmacySubtitle" class="subcaption">Στη γειτονιά σου και κοντινές περιοχές</p></div></div>
 <div id="pharmacyMeta" class="notice" aria-live="polite" data-state="loading">Αναζήτηση εφημερευόντων φαρμακείων…</div>
 <div id="pharmacies" class="results"></div>
 </section>
