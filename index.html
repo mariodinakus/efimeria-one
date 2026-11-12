@@ -8,10 +8,14 @@
 <link rel="stylesheet" href="/v5.css?v=5.2">\n<link rel="stylesheet" href="/er-wait.css?v=1">
 <script src="/v5.js?v=5.2" defer></script>
 <script src="/v5-enhance.js?v=5.2" defer></script>\n<script src="/er-wait.js?v=1" defer></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoTj/5nt7iOVu8=" crossorigin="">
+<link rel="stylesheet" href="/duty-radar.css?v=1">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="" defer></script>
+<script src="/duty-radar.js?v=1" defer></script>
 </head><body><div class="app">
 <header><div class="logo"><span class="mark">✚</span><span>efimeria<span class="mint">.</span><small>ONE</small></span></div><div class="top-right"><button id="language" type="button" class="ghost">EN</button><a class="sos" href="tel:112">SOS <b>112</b></a></div></header>
 <main>
-<div class="top-title"><div class="eyebrow" data-t="kicker">ΕΦΗΜΕΡΙΕΣ · ΕΛΛΑΔΑ</div><h1 data-html="heading">Ποιος <em>εφημερεύει</em> κοντά σου;</h1><p data-t="summary">Χωρίς χάρτες και PDF. Δες δημοσιευμένες εφημερίες, ειδικότητες, ώρες, τηλέφωνα και Google Maps.</p></div>
+<div class="top-title"><div class="eyebrow" data-t="kicker">ΕΦΗΜΕΡΙΕΣ · ΕΛΛΑΔΑ</div><h1 data-html="heading">Ποιος <em>εφημερεύει</em> κοντά σου;</h1><p data-t="summary">Δες δημοσιευμένες εφημερίες, ειδικότητες, χάρτη θέσεων και στοιχεία αναμονής όπου υπάρχουν επίσημα.</p></div>
 <div class="alert"><span class="alert-icon">!</span><p data-html="emergency">Σοβαρό επείγον; Κάλεσε <a href="tel:112">112</a> ή <a href="tel:166">166</a>. Τα δημοσιευμένα προγράμματα δεν εγγυώνται διαθεσιμότητα σε πραγματικό χρόνο.</p></div>
 <section class="finder">
 <div class="question"><div><div class="overline" data-t="locationLabel">ΠΕΡΙΟΧΗ ΑΝΑΖΗΤΗΣΗΣ</div><h2 id="areaQuestion">Είσαι στη Μενεμένη;</h2><p id="areaNote">Προεπιλεγμένη περιοχή · επιβεβαίωσε ή άλλαξέ την</p></div><span class="pin">⌖</span></div>
@@ -20,6 +24,23 @@
 <div id="message" role="status" aria-live="polite"></div>
 </section>
 <div class="controls"><div class="date-controls"><button id="nowTab" class="choice active" type="button" data-t="now">Τρέχουσα εφημερία</button><button id="dayTab" class="choice" type="button" data-t="chooseDate">Επιλογή ημερομηνίας</button></div><div id="pickerWrap" hidden><label for="date" data-t="dutyDate">Ημερομηνία</label><input type="date" id="date"></div></div>
+<section id="geoRadar" aria-label="Duty map and activity">
+  <div class="radar-header"><div><div class="radar-eyebrow">03 / DUTY RADAR</div><h2 id="radarTitle">Χάρτης & κινητικότητα εφημεριών</h2><p class="radar-subtitle" id="radarSubtitle"></p></div>
+    <div class="radar-filters" role="group" aria-label="Filter facilities">
+      <button id="radarFilter-all" type="button" aria-pressed="true">Όλα</button>
+      <button id="radarFilter-hosp" type="button" aria-pressed="false">Νοσοκομεία</button>
+      <button id="radarFilter-pharm" type="button" aria-pressed="false">Φαρμακεία</button>
+    </div></div>
+  <div class="radar-origin-row"><span id="radarOrigin" class="radar-origin"></span><button id="radarGps" class="radar-gps" type="button">GPS · Η θέση μου</button></div>
+  <div id="radarMetrics" class="radar-stats" aria-live="polite"></div>
+  <div class="radar-layout"><div class="radar-map-shell"><div id="dutyMap" role="region" aria-label="Interactive map"></div></div>
+    <div class="radar-side"><div class="radar-panel"><h3 id="radarNearbyTitle"></h3><div id="radarNearby" class="radar-nearby"></div></div>
+    <div class="radar-panel"><h3 id="radarLiveTitle"></h3><div id="radarLive"></div></div></div></div>
+  <div class="radar-chart-wrap"><h3 id="radarChartTitle"></h3><div class="radar-chart" id="radarChart"></div>
+    <div class="radar-legend"><span class="radar-key">Hospitals / Νοσοκομεία</span><span class="radar-key pharmacy">Pharmacies / Φαρμακεία</span></div>
+    <p class="radar-chart-note" id="radarChartNote"></p></div>
+  <p class="radar-disclaimer" id="radarDisclaimer"></p><p id="radarSource"></p>
+</section>
 <section id="hospitalSection" class="section">
 <div class="section-bar"><span class="section-icon hospital">✚</span><div><div class="overline">01 / HOSPITAL DUTY</div><h2 data-t="hospitalTitle">Εφημερεύοντα νοσοκομεία</h2><p id="hospitalSubtitle" class="subcaption"></p></div></div>
 <div class="specialty"><label for="specialty" data-t="specialty">Φίλτρο ειδικότητας</label><select id="specialty"></select></div>
@@ -33,4 +54,4 @@
 </section>
 <section class="explain"><div class="overline" data-t="sources">ΠΗΓΕΣ & ΑΞΙΟΠΙΣΤΙΑ</div><h3 data-t="sourceHeading">Πραγματικές καταχωρίσεις, όχι εικασίες</h3><p data-t="sourceText">Οι εφημερίες προέρχονται από δημοσιευμένα προγράμματα ή επαγγελματικούς καταλόγους. Η ένδειξη «σε ισχύ σύμφωνα με το πρόγραμμα» δεν είναι επιβεβαίωση ότι η μονάδα μπορεί να σε εξυπηρετήσει τώρα. Πάντα τηλεφώνησε πριν φύγεις.</p>
 <div class="sources"><a href="https://www.3ype.gr/category/efimeries/" target="_blank" rel="noopener noreferrer">3η ΥΠΕ ↗</a><a href="https://www.thessalonikiguide.gr/efimerevonta-nosokomeia/" target="_blank" rel="noopener noreferrer">ThessalonikiGuide ↗</a><a href="https://efimeries.fsth.gr/" target="_blank" rel="noopener noreferrer">ΦΣ Θεσσαλονίκης ↗</a><a href="https://www.xo.gr/efimerevonta-farmakeia/" target="_blank" rel="noopener noreferrer">xo.gr ↗</a></div></section>
-</main><footer>EFIMERIA ONE · v5.2 <span>●</span> GREECE / ΕΛΛΑΔΑ <p data-t="footer">Η εφαρμογή δεν υποκαθιστά το ΕΚΑΒ ή ιατρικές οδηγίες. Για πραγματικό επείγον: 112 ή 166.</p></footer></div></body></html>
+</main><footer>EFIMERIA ONE · v5.3 <span>●</span> GREECE / ΕΛΛΑΔΑ <p data-t="footer">Η εφαρμογή δεν υποκαθιστά το ΕΚΑΒ ή ιατρικές οδηγίες. Για πραγματικό επείγον: 112 ή 166.</p></footer></div></body></html>
