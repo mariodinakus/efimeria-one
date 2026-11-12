@@ -86,7 +86,8 @@
     if(slots.some(([a])=>m<a))return 'later';
     return 'ended';
   }
-  let filter='all',map=null,markersLayer=null,selfMarker=null,markerMap=new Map(),cameraKey='',lastLocation='',mapResizeObserver=null;
+  let filter='all',map=null,markersLayer=null,selfMarker=null,markerMap=new Map(),cameraKey='',lastLocation='',mapResizeObserver=null,baseLayer=null;
+  let mapFrame=0,prevMapWidth=0,prevMapHeight=0;
   let mapMode='night';
   try{mapMode=localStorage.getItem('efimeria-map-style')==='street'?'street':'night';}catch{}
   function applyMapStyle(){
@@ -95,6 +96,25 @@
     for(const [key,id] of [['night','radarModeNight'],['street','radarModeStreet']]){
       const b=byId(id);b.setAttribute('aria-pressed',String(mapMode===key));
     }
+    if(!map)return;
+    if(baseLayer)map.removeLayer(baseLayer);
+    // True dark/light basemap tiles avoid GPU-filter clipping on mobile devices.
+    const variant=mapMode==='night'?'dark_all':'voyager';
+    const attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>';
+    const next=L.tileLayer('https://{s}.basemaps.cartocdn.com/'+variant+'/{z}/{x}/{y}{r}.png',{
+      attribution,subdomains:'abcd',maxZoom:19
+    });
+    baseLayer=next.addTo(map);
+    let errors=0;
+    next.on('tileerror',()=>{
+      // If the styled provider fails, still show the map via standard OSM.
+      if(++errors<4||baseLayer!==next)return;
+      map.removeLayer(next);
+      baseLayer=L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
+        attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        maxZoom:19
+      }).addTo(map);
+    });
   }
   let liveData=null,lastLiveAt=0,working=false;
   const historyKey='efimeria-public-queue-history-v1';
@@ -207,21 +227,37 @@
       : '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="8.5" width="17" height="7" rx="3.5" transform="rotate(-45 12 12)" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M9.5 9.5l5 5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>';
     return L.divIcon({className:'radar-map-icon',html:'<span class="radar-pin '+(hospital?'hospital':'pharmacy')+' '+phase(p,selectedDate())+'">'+glyph+'</span>',iconSize:[40,40],iconAnchor:[20,20],popupAnchor:[0,-25]});
   }
-  function fitMap(items,force=false){
+  function fitMap(items,force=false,showAll=false){
     if(!map||!valid(selected))return;
-    const k=selected.lat+'|'+selected.lon+'|'+filter+'|'+items.filter(valid).map(p=>p.lat+','+p.lon).join(';');
+    const size=map.getSize();
+    if(size.x<100||size.y<100)return;
+    const points=items.filter(valid);
+    const k=selected.lat+'|'+selected.lon+'|'+filter+'|'+points.map(p=>p.lat+','+p.lon).join(';');
     if(!force&&cameraKey===k)return;
     cameraKey=k;
-    const coords=[coord(selected),...items.filter(valid).map(coord)];
-    if(coords.length>1)map.fitBounds(L.latLngBounds(coords),{padding:[52,52],maxZoom:13,animate:false});
-    else map.setView(coord(selected),12,{animate:false});
+    // Avoid zooming out to remote outliers on first view. The fit control still shows everything.
+    const near=showAll?points:points.filter(p=>getDistance(p)===null||getDistance(p)<=65);
+    const coords=[coord(selected),...near.map(coord)];
+    const mobile=size.x<560;
+    const padding=mobile?[18,25]:[34,38];
+    if(coords.length>1){
+      map.fitBounds(L.latLngBounds(coords),{padding,maxZoom:mobile?12:13,animate:false});
+    }else{
+      map.setView(coord(selected),mobile?11:12,{animate:false});
+    }
   }
-  function refreshMapBounds(force=true){
+  function refreshMapBounds(force=false,showAll=false){
     if(!map)return;
-    requestAnimationFrame(()=>{
+    cancelAnimationFrame(mapFrame);
+    mapFrame=requestAnimationFrame(()=>{
       if(!map)return;
-      map.invalidateSize({pan:false});
-      fitMap(getItems(),force);
+      const container=byId('dutyMap');
+      const w=container.clientWidth,h=container.clientHeight;
+      if(w<100||h<100)return;
+      const resized=Math.abs(w-prevMapWidth)>1||Math.abs(h-prevMapHeight)>1;
+      prevMapWidth=w;prevMapHeight=h;
+      map.invalidateSize({pan:false,animate:false});
+      fitMap(getItems(),force||resized,showAll);
     });
   }
   function drawMap(items){
@@ -232,10 +268,6 @@
       map=L.map(container,{zoomControl:false,scrollWheelZoom:false,preferCanvas:true,attributionControl:true})
         .setView(coord(selected),12);
       L.control.zoom({position:'bottomright'}).addTo(map);
-      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
-        attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-        maxZoom:19
-      }).addTo(map);
       applyMapStyle();
       markersLayer=L.layerGroup().addTo(map);
       if('ResizeObserver' in window){
@@ -348,7 +380,7 @@
       byId(button).onclick=()=>{filter=key;cameraKey='';schedule();};
     }
     byId('radarGps').onclick=()=>byId('gps')?.click();
-    byId('radarFit').onclick=()=>refreshMapBounds(true);
+    byId('radarFit').onclick=()=>refreshMapBounds(true,true);
     for(const [mode,id] of [['night','radarModeNight'],['street','radarModeStreet']]){
       byId(id).onclick=()=>{
         mapMode=mode;
@@ -360,14 +392,24 @@
     const mapShell=byId('dutyMap').closest('.radar-map-shell'),expand=byId('radarExpand');
     expand.onclick=()=>{
       const full=mapShell.classList.toggle('is-expanded');
+      root.classList.toggle('radar-fullscreen-active',full);
       document.body.classList.toggle('radar-map-expanded',full);
       expand.setAttribute('aria-pressed',String(full));
       expand.textContent=tr(full?'collapse':'expand');
-      setTimeout(()=>refreshMapBounds(true),50);
+      // Re-evaluate size after layout and the dynamic mobile viewport settle.
+      refreshMapBounds(true);
+      setTimeout(()=>refreshMapBounds(true),160);
     };
     document.addEventListener('keydown',event=>{
       if(event.key==='Escape'&&mapShell.classList.contains('is-expanded'))expand.click();
     });
+    window.addEventListener('resize',()=>refreshMapBounds());
+    window.addEventListener('orientationchange',()=>setTimeout(()=>refreshMapBounds(true),250));
+    window.addEventListener('pageshow',()=>refreshMapBounds(true));
+    document.addEventListener('visibilitychange',()=>{
+      if(!document.hidden)refreshMapBounds();
+    });
+    if(window.visualViewport)window.visualViewport.addEventListener('resize',()=>refreshMapBounds());
     for(const id of ['hospitals','pharmacies','nextResults']){
       const target=byId(id);if(target)new MutationObserver(schedule).observe(target,{childList:true});
     }

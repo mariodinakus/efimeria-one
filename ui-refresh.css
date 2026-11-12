@@ -223,3 +223,82 @@ footer{color:#849ba7;border-color:#33424e}
  #geoRadar .radar-map-legend{gap:8px}
 }
 @media(prefers-reduced-motion:reduce){#geoRadar .radar-pin,#geoRadar #dutyMap .leaflet-tile-pane{transition:none}}
+
+
+/* v5.5 — correct map clipping on narrow and rotating screens. */
+/* Do not isolate the map's fixed fullscreen layer inside a lower stacking context. */
+#geoRadar{isolation:auto!important;overflow:visible}
+#geoRadar.radar-fullscreen-active{z-index:2147483000!important}
+#geoRadar .radar-layout,
+#geoRadar .radar-map-shell,
+#geoRadar #dutyMap{
+  min-width:0!important;width:100%;max-width:100%;
+}
+#geoRadar .radar-map-shell{box-sizing:border-box}
+#geoRadar #dutyMap{display:block;position:relative;overflow:hidden;touch-action:pan-x pan-y}
+#geoRadar #dutyMap.map-night .leaflet-tile-pane{filter:none!important}
+#geoRadar #dutyMap .leaflet-pane,
+#geoRadar #dutyMap .leaflet-map-pane{max-width:none;max-height:none}
+#geoRadar .radar-map-shell.is-expanded{
+  position:fixed!important;inset:0!important;
+  z-index:2147483001!important;
+  width:100vw!important;max-width:none!important;
+  height:100vh!important;height:100dvh!important;
+  max-height:none!important;
+  display:flex!important;flex-direction:column!important;
+  border:0!important;border-radius:0!important;
+  background:#101b24!important;
+}
+#geoRadar .radar-map-shell.is-expanded #dutyMap{
+  flex:1 1 0!important;min-height:0!important;
+  height:auto!important;max-height:none!important;
+}
+@media(max-width:680px){
+  /* Move controls OUT of the map image. Previously a single wide row
+     was cropped, hiding the last controls and part of the visible map. */
+  #geoRadar .radar-map-shell{display:flex;flex-direction:column}
+  #geoRadar .radar-map-tools{
+    order:0;position:relative!important;inset:auto!important;
+    left:auto!important;right:auto!important;top:auto!important;
+    width:100%!important;max-width:none!important;
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+    gap:8px!important;padding:11px!important;
+    background:#14232f;border-bottom:1px solid #39515c;
+    box-shadow:none;z-index:800;
+  }
+  #geoRadar .radar-map-style{grid-column:1/-1;min-width:0;display:grid;grid-template-columns:1fr 1fr}
+  #geoRadar .radar-map-style button{width:100%;min-width:0;white-space:nowrap}
+  #geoRadar .radar-map-tools>button{
+    min-width:0;width:100%;min-height:39px;
+    white-space:normal;text-align:center;
+  }
+  #geoRadar #dutyMap{
+    order:1;flex:0 0 auto;min-width:0!important;width:100%!important;
+    height:clamp(440px,60dvh,610px)!important;
+    border-radius:0!important;
+  }
+  #geoRadar .radar-map-summary,
+  #geoRadar .radar-map-legend{
+    position:relative!important;inset:auto!important;
+    top:auto!important;left:auto!important;right:auto!important;bottom:auto!important;
+    max-width:none!important;
+    border-radius:0!important;border:0!important;
+    background:#14232f!important;box-shadow:none!important;
+    backdrop-filter:none!important;
+    align-self:stretch;
+  }
+  #geoRadar .radar-map-summary{
+    order:2;border-top:1px solid #39515c!important;
+    padding:11px 13px!important;
+  }
+  #geoRadar .radar-map-legend{order:3;padding:0 13px 13px!important}
+  #geoRadar .radar-map-shell.is-expanded #dutyMap{
+    flex:1 1 0!important;
+    min-height:0!important;
+    height:auto!important;
+    max-height:none!important;
+  }
+  #geoRadar .radar-map-shell.is-expanded .radar-map-tools{top:auto!important;padding-top:max(11px,env(safe-area-inset-top))!important}
+  #geoRadar .radar-map-shell.is-expanded .radar-map-legend{padding-bottom:max(13px,env(safe-area-inset-bottom))!important}
+}
