@@ -8,7 +8,7 @@
     el:{
       title:'Χάρτης & κινητικότητα εφημεριών',subtitle:'Πού βρίσκονται οι υπηρεσίες σε σχέση με εσένα και πώς αλλάζει το δημοσιευμένο ωράριο.',
       all:'Όλα',hosp:'Νοσοκομεία',pharm:'Φαρμακεία',gps:'GPS · Η θέση μου',area:'Κέντρο επιλεγμένης περιοχής',
-      active:'Σε εφημερία βάσει ωραρίου',later:'Αρχίζουν αργότερα',mapped:'Σημεία στον χάρτη',
+      active:'Σε εφημερία βάσει ωραρίου',later:'Αρχίζουν αργότερα',mapped:'Σημεία στον χάρτη',dated:'Καταχωρίσεις ημερομηνίας',withHours:'Με γνωστό ωράριο',
       next:'Οι κοντινότερες επιλογές',now:'Σε ισχύ βάσει ωραρίου',soon:'Αργότερα',ended:'Εκτός δηλωμένου ωραρίου',
       unknown:'Ωράριο μη ελέγξιμο',unknownCoords:'Δεν υπάρχουν επαληθευμένες συντεταγμένες',
       straight:'Απόσταση σε ευθεία',route:'Οδηγίες',call:'Κλήση',mapFail:'Ο χάρτης δεν φορτώθηκε. Οι επιλογές και οι οδηγίες παραμένουν διαθέσιμες.',
@@ -24,7 +24,7 @@
     en:{
       title:'Duty map & activity',subtitle:'See facilities relative to your location and how published duty hours change.',
       all:'All',hosp:'Hospitals',pharm:'Pharmacies',gps:'GPS · My location',area:'Selected area centre',
-      active:'Scheduled as on duty',later:'Starting later',mapped:'Mapped locations',
+      active:'Scheduled as on duty',later:'Starting later',mapped:'Mapped locations',dated:'Dated entries',withHours:'Known duty hours',
       next:'Closest facilities',now:'On duty by schedule',soon:'Later',ended:'Outside published hours',
       unknown:'Hours not verifiable',unknownCoords:'Verified coordinates unavailable',
       straight:'Straight-line distance',route:'Directions',call:'Call',mapFail:'Map unavailable. Listings and directions are still accessible.',
@@ -59,7 +59,7 @@
     let h=String(item.hours||'').toUpperCase()
       .replace(/ΜΕΣΑΝΥΧΤΑ/g,'00:00')
       .replace(/[–—−]/g,'-')
-      .replace(/ΕΩΣ/g,'-');
+      .replace(/ΕΩΣ/g,'-').replace(/ΒΡΑΔΥ|ΠΡΩΪ|ΠΡΩΙ|ΠΡΩΊ/g,' ');
     const ranges=[];
     const rx=/(\d{1,2}):(\d{2})\s*(?:-|TO)\s*(\d{1,2}):(\d{2})/g;
     for(const m of h.matchAll(rx)){
@@ -131,9 +131,9 @@
     const base=selectedDate(),now=items.filter(p=>phase(p,base)==='now').length;
     const later=items.filter(p=>phase(p,base)==='later').length;
     const mapped=items.filter(valid).length;
-    const entries=[
-      {v:now,l:tr('active')},{v:later,l:tr('later')},{v:mapped,l:tr('mapped')}
-    ];
+    const entries=customDate?
+      [{v:items.length,l:tr('dated')},{v:items.filter(p=>intervals(p).length>0).length,l:tr('withHours')},{v:mapped,l:tr('mapped')}]:
+      [{v:now,l:tr('active')},{v:later,l:tr('later')},{v:mapped,l:tr('mapped')}];
     const holder=byId('radarMetrics');holder.replaceChildren();
     for(const entry of entries){
       const b=mk('div','radar-stat');
@@ -178,7 +178,7 @@
     return e;
   }
   function markerIcon(p){
-    return L.divIcon({className:'radar-map-icon',html:'<span class="radar-pin '+(p.type==='hospital'?'hospital':'pharmacy')+'">'+(p.type==='hospital'?'+':'✦')+'</span>',iconSize:[27,34],iconAnchor:[13,33],popupAnchor:[0,-27]});
+    return L.divIcon({className:'radar-map-icon',html:'<span class="radar-pin '+(p.type==='hospital'?'hospital':'pharmacy')+' '+phase(p,selectedDate())+'">'+(p.type==='hospital'?'+':'✦')+'</span>',iconSize:[27,34],iconAnchor:[13,33],popupAnchor:[0,-27]});
   }
   function fitMap(items){
     if(!map||!valid(selected))return;
