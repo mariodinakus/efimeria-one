@@ -18,7 +18,7 @@
       live:'Δημόσια ζωντανή αναμονή ΤΕΠ',liveNo:'Δεν υπάρχουν διαθέσιμα επαληθευμένα live δεδομένα αναμονής αυτή τη στιγμή.',
       liveWait:'Περιμένουν γιατρό',liveTriage:'Περιμένουν διαλογή',liveAverage:'Μέση αναμονή',liveUpdate:'Ενημέρωση πηγής',
       history:'Μεταβολή από προηγούμενη καταγραφή',historyNote:'Ιστορικό μόνο των πραγματικών μετρήσεων που κατέγραψε αυτός ο browser.',
-      minutes:'λεπτά',noGps:'Η ένδειξη απόστασης υπολογίζεται από την επιλεγμένη περιοχή, όχι από το GPS σου.',
+      minutes:'λεπτά',fit:'Όλα τα σημεία',expand:'Πλήρης οθόνη',collapse:'Κλείσιμο πλήρους οθόνης',noGps:'Η ένδειξη απόστασης υπολογίζεται από την επιλεγμένη περιοχή, όχι από το GPS σου.',
       noCapacity:'Η συχνότητα εφημεριών δεν δείχνει κίνηση ασθενών. Η διαλογή προηγείται της σειράς άφιξης.'
     },
     en:{
@@ -34,7 +34,7 @@
       live:'Verified public ED queue',liveNo:'Verified live wait-time data are currently unavailable.',
       liveWait:'Waiting for doctor',liveTriage:'Waiting for triage',liveAverage:'Average wait',liveUpdate:'Source updated',
       history:'Change since previous observation',historyNote:'History consists only of real observations collected in this browser.',
-      minutes:'minutes',noGps:'Distances use the selected area centre, not your exact GPS position.',
+      minutes:'minutes',fit:'Show all points',expand:'Fullscreen',collapse:'Exit fullscreen',noGps:'Distances use the selected area centre, not your exact GPS position.',
       noCapacity:'Duty coverage is not patient traffic. Medical triage determines priority.'
     }
   };
@@ -86,7 +86,7 @@
     if(slots.some(([a])=>m<a))return 'later';
     return 'ended';
   }
-  let filter='all',map=null,markersLayer=null,selfMarker=null,markerMap=new Map(),cameraKey='',lastLocation='';
+  let filter='all',map=null,markersLayer=null,selfMarker=null,markerMap=new Map(),cameraKey='',lastLocation='',mapResizeObserver=null;
   let liveData=null,lastLiveAt=0,working=false;
   const historyKey='efimeria-public-queue-history-v1';
   let history=[];
@@ -121,6 +121,8 @@
     byId('radarSubtitle').textContent=tr('subtitle');
     for(const k of ['all','hosp','pharm'])byId('radarFilter-'+k).textContent=tr(k);
     byId('radarGps').textContent=tr('gps');
+    byId('radarFit').textContent=tr('fit');
+    byId('radarExpand').textContent=tr(byId('dutyMap').closest('.radar-map-shell').classList.contains('is-expanded')?'collapse':'expand');
     byId('radarOrigin').textContent=(selected.isGps?tr('gps'):tr('area'))+' · '+(selected[isEnglish()?'en':'el']||selected.el);
     byId('radarDisclaimer').textContent=tr('noCapacity')+' '+(selected.isGps?'':tr('noGps'));
     byId('radarChartTitle').textContent=tr('chart');
@@ -186,14 +188,22 @@
   function markerIcon(p){
     return L.divIcon({className:'radar-map-icon',html:'<span class="radar-pin '+(p.type==='hospital'?'hospital':'pharmacy')+' '+phase(p,selectedDate())+'">'+(p.type==='hospital'?'+':'✦')+'</span>',iconSize:[27,34],iconAnchor:[13,33],popupAnchor:[0,-27]});
   }
-  function fitMap(items){
+  function fitMap(items,force=false){
     if(!map||!valid(selected))return;
-    const k=selected.lat+'|'+selected.lon+'|'+filter+'|'+items.map(p=>p.lat+','+p.lon).join(';');
-    if(cameraKey===k)return;
+    const k=selected.lat+'|'+selected.lon+'|'+filter+'|'+items.filter(valid).map(p=>p.lat+','+p.lon).join(';');
+    if(!force&&cameraKey===k)return;
     cameraKey=k;
     const coords=[coord(selected),...items.filter(valid).map(coord)];
-    if(coords.length>1)map.fitBounds(L.latLngBounds(coords),{padding:[30,30],maxZoom:13,animate:false});
+    if(coords.length>1)map.fitBounds(L.latLngBounds(coords),{padding:[52,52],maxZoom:13,animate:false});
     else map.setView(coord(selected),12,{animate:false});
+  }
+  function refreshMapBounds(force=true){
+    if(!map)return;
+    requestAnimationFrame(()=>{
+      if(!map)return;
+      map.invalidateSize({pan:false});
+      fitMap(getItems(),force);
+    });
   }
   function drawMap(items){
     const container=byId('dutyMap');
@@ -207,6 +217,10 @@
         maxZoom:18
       }).addTo(map);
       markersLayer=L.layerGroup().addTo(map);
+      if('ResizeObserver' in window){
+        mapResizeObserver=new ResizeObserver(()=>refreshMapBounds());
+        mapResizeObserver.observe(container);
+      }
     }
     markersLayer.clearLayers();markerMap.clear();
     if(selfMarker)map.removeLayer(selfMarker);
@@ -218,8 +232,7 @@
       const marker=L.marker(coord(p),{icon:markerIcon(p)}).bindPopup(popupContent(p));
       marker.addTo(markersLayer);markerMap.set(p,marker);
     }
-    fitMap(items);
-    setTimeout(()=>map.invalidateSize({pan:false}),80);
+    refreshMapBounds(false);
   }
   function drawNearby(items){
     const div=byId('radarNearby');div.replaceChildren();
@@ -314,6 +327,18 @@
       byId(button).onclick=()=>{filter=key;cameraKey='';schedule();};
     }
     byId('radarGps').onclick=()=>byId('gps')?.click();
+    byId('radarFit').onclick=()=>refreshMapBounds(true);
+    const mapShell=byId('dutyMap').closest('.radar-map-shell'),expand=byId('radarExpand');
+    expand.onclick=()=>{
+      const full=mapShell.classList.toggle('is-expanded');
+      document.body.classList.toggle('radar-map-expanded',full);
+      expand.setAttribute('aria-pressed',String(full));
+      expand.textContent=tr(full?'collapse':'expand');
+      setTimeout(()=>refreshMapBounds(true),50);
+    };
+    document.addEventListener('keydown',event=>{
+      if(event.key==='Escape'&&mapShell.classList.contains('is-expanded'))expand.click();
+    });
     for(const id of ['hospitals','pharmacies','nextResults']){
       const target=byId(id);if(target)new MutationObserver(schedule).observe(target,{childList:true});
     }

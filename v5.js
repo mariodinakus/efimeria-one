@@ -20,15 +20,15 @@ const SPEC=[
 const TEXT={
  el:{
  kicker:'ΕΦΗΜΕΡΙΕΣ · ΕΛΛΑΔΑ',heading:'Ποιος <em>εφημερεύει</em> κοντά σου;',
- summary:'Νοσοκομεία ανά ειδικότητα και φαρμακεία με ώρες, τηλέφωνα και Google Maps. Χωρίς ενσωματωμένους χάρτες.',
+ summary:'Νοσοκομεία ανά ειδικότητα και φαρμακεία με ώρες, τηλέφωνα και Google Maps. με διαδραστικό χάρτη.',
  emergency:'Σοβαρό επείγον; Κάλεσε <a href="tel:112">112</a> ή <a href="tel:166">166</a>. Οι δημοσιευμένες εφημερίες δεν εγγυώνται διαθεσιμότητα σε πραγματικό χρόνο.',
- locationLabel:'ΠΕΡΙΟΧΗ ΑΝΑΖΗΤΗΣΗΣ',confirm:'Ναι, Μενεμένη',change:'Άλλη περιοχή',cityLabel:'Πόλη / γειτονιά',search:'Αναζήτηση',
+ locationLabel:'ΠΕΡΙΟΧΗ ΑΝΑΖΗΤΗΣΗΣ',confirm:'Χρήση περιοχής',change:'Άλλη περιοχή',cityLabel:'Πόλη / γειτονιά',search:'Αναζήτηση',
  now:'Σε ισχύ τώρα',chooseDate:'Άλλη ημερομηνία',dutyDate:'Ημερομηνία',hospitalTitle:'Εφημερεύοντα νοσοκομεία',pharmacyTitle:'Εφημερεύοντα φαρμακεία',
  pharmacySubtitle:'Στην περιοχή σου και γειτονικές περιοχές',specialty:'Ειδικότητα',sources:'ΠΗΓΕΣ & ΑΞΙΟΠΙΣΤΙΑ',
  sourceHeading:'Δημοσιευμένα προγράμματα, όχι εικασίες',
  sourceText:'Παρουσιάζονται δημοσιευμένα προγράμματα νοσοκομείων και κατάλογοι φαρμακείων τρίτων. Η εφημερία βάσει προγράμματος δεν εγγυάται ότι μια μονάδα είναι ανοιχτή ή διαθέσιμη τώρα. Επιβεβαίωσε τηλεφωνικά πριν ξεκινήσεις.',
  footer:'Δεν υποκαθιστά ιατρική βοήθεια ή το ΕΚΑΒ. Για επείγον κάλεσε 112 ή 166.',
- areaQuestion:'Είσαι στην περιοχή {area};',selectedArea:'Επιλεγμένη περιοχή',defaultArea:'Προεπιλογή · πάτησε επιβεβαίωση ή άλλαξε περιοχή',
+ areaQuestion:'Πού θέλεις να δεις εφημερίες;',selectedArea:'Επιλεγμένη περιοχή',defaultArea:'Προεπιλεγμένη περιοχή (όχι η θέση σου)',
  detectedArea:'Περιοχή μέσω GPS (κατά προσέγγιση)',dateNow:'Σε ισχύ σύμφωνα με πρόγραμμα',dateOther:'Δημοσιευμένο πρόγραμμα της ημέρας',
  next:'Επόμενη εφημερία',nextStart:'Από τις 08:00',loadingHospital:'Διαβάζω τα δημοσιευμένα προγράμματα νοσοκομείων…',loadingPharmacy:'Αναζητώ δημοσιευμένες εφημερίες φαρμακείων…',
  published:'Δημοσιευμένες καταχωρίσεις • Επιβεβαίωσε τηλεφωνικά πριν ξεκινήσεις.',
@@ -48,15 +48,15 @@ const TEXT={
  },
  en:{
  kicker:'DUTY ROSTERS · GREECE',heading:'Who is <em>on duty</em> near you?',
- summary:'Hospitals by medical specialty and duty pharmacies, with hours, phone numbers and Google Maps. No embedded map.',
+ summary:'Hospitals by medical specialty and duty pharmacies, with hours, phone numbers and Google Maps. Interactive map included.',
  emergency:'Serious emergency? Call <a href="tel:112">112</a> or <a href="tel:166">166</a>. Published rosters do not guarantee real-time availability.',
- locationLabel:'SEARCH AREA',confirm:'Yes, Menemeni',change:'Change area',cityLabel:'City / neighborhood',search:'Search',
+ locationLabel:'SEARCH AREA',confirm:'Use this area',change:'Change area',cityLabel:'City / neighborhood',search:'Search',
  now:'On duty now (scheduled)',chooseDate:'Other date',dutyDate:'Date',hospitalTitle:'Hospitals on duty',pharmacyTitle:'Duty pharmacies',
  pharmacySubtitle:'In and around your neighborhood',specialty:'Medical specialty',sources:'SOURCES & RELIABILITY',
  sourceHeading:'Published schedules, not guesses',
  sourceText:'Hospital duty rosters and third-party pharmacy listings are shown. Published duty hours do not prove a facility is currently open or able to assist you. Call before travelling.',
  footer:'Not a substitute for emergency services or medical advice. In an emergency call 112 or 166.',
- areaQuestion:'Are you in {area}?',selectedArea:'Selected area',defaultArea:'Default area — confirm or change',detectedArea:'Approximate GPS area',
+ areaQuestion:'Where would you like to search?',selectedArea:'Selected area',defaultArea:'Default search area (not your location)',detectedArea:'Approximate GPS area',
  dateNow:'Current scheduled duty shift',dateOther:'Published duty roster for date',
  next:'Next duty shift',nextStart:'From 08:00',loadingHospital:'Reading published hospital schedules…',loadingPharmacy:'Finding dated pharmacy duty listings…',
  published:'Published duty records • Call before travelling.',
@@ -92,7 +92,7 @@ const norm=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').repl
 const distance=(a,b,c,d)=>{const rad=Math.PI/180,z=Math.sin((c-a)*rad/2)**2+Math.cos(a*rad)*Math.cos(c*rad)*Math.sin((d-b)*rad/2)**2;return 6371*2*Math.atan2(Math.sqrt(z),Math.sqrt(1-z))};
 let lang='el';try{lang=localStorage.getItem('efimeria-lang')==='en'?'en':'el'}catch{}
 const locKey='efimeria-area-v5';
-let selected={el:'Μενεμένη',en:'Menemeni',lat:40.6574,lon:22.9073},confirmed=false;
+let selected={el:'Θεσσαλονίκη',en:'Thessaloniki',lat:40.6401,lon:22.9444},confirmed=false;
 try{const old=JSON.parse(localStorage.getItem(locKey)||'null');if(old&&typeof old.el==='string'&&typeof old.en==='string'){selected=old;confirmed=true}}catch{}
 let chooseManual=false,customDate=false,requestId=0,hospResult=null,pharmResult=null,nextResult=null,specialty='all';
 const t=k=>TEXT[lang][k]||k;
@@ -115,10 +115,10 @@ function msg(txt){$('message').textContent=txt||''}
 function fillLocale(){document.documentElement.lang=lang;$('language').textContent=lang==='el'?'EN':'ΕΛ';
  document.querySelectorAll('[data-t]').forEach(el=>el.textContent=t(el.dataset.t));
  document.querySelectorAll('[data-html]').forEach(el=>el.innerHTML=t(el.dataset.html));
- $('areaQuestion').textContent=phrase('areaQuestion',{area:label()});
- $('areaNote').textContent=t(confirmed?'selectedArea':'defaultArea');
- $('confirmArea').querySelector('[data-t]').textContent=lang==='el'?'Ναι, '+label():'Yes, '+label();
- $('city').placeholder=lang==='el'?'Πόλη ή συνοικία, π.χ. Μενεμένη':'City or area, e.g. Menemeni';
+ $('areaQuestion').textContent=t('areaQuestion');
+ $('areaNote').textContent=t(confirmed?'selectedArea':'defaultArea')+' · '+label();
+ $('confirmArea').querySelector('[data-t]').textContent=t('confirm');
+ $('city').placeholder=lang==='el'?'Πόλη ή συνοικία, π.χ. Θεσσαλονίκη':'City or area, e.g. Thessaloniki';
  const sp=$('specialty');sp.replaceChildren();for(const [key,gr,en] of SPEC){const o=safeNode('option','',lang==='el'?gr:en);o.value=key;sp.append(o)}sp.value=specialty;
  $('cities').replaceChildren();for(const [gr,en] of PLACES){const o=safeNode('option');o.value=lang==='el'?gr:en;$('cities').append(o)}
  $('pickerWrap').hidden=!customDate;$('nowTab').classList.toggle('active',!customDate);$('dayTab').classList.toggle('active',customDate);
