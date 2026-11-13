@@ -20,7 +20,7 @@ const SPEC=[
 const TEXT={
  el:{
  kicker:'ΕΦΗΜΕΡΙΕΣ · ΕΛΛΑΔΑ',heading:'Ποιος <em>εφημερεύει</em> κοντά σου;',
- summary:'Νοσοκομεία ανά ειδικότητα και φαρμακεία με ώρες, τηλέφωνα και Google Maps. με διαδραστικό χάρτη.',
+ summary:'Εφημερεύοντα νοσοκομεία και φαρμακεία με ώρες, τηλέφωνα και οδηγίες Google Maps.',mapDirectionsNote:'Για οδηγίες και τοποθεσία, άνοιξε το Google Maps από κάθε καταχώριση.',
  emergency:'Σοβαρό επείγον; Κάλεσε <a href="tel:112">112</a> ή <a href="tel:166">166</a>. Οι δημοσιευμένες εφημερίες δεν εγγυώνται διαθεσιμότητα σε πραγματικό χρόνο.',
  locationLabel:'ΠΕΡΙΟΧΗ ΑΝΑΖΗΤΗΣΗΣ',confirm:'Χρήση περιοχής',change:'Άλλη περιοχή',cityLabel:'Πόλη / γειτονιά',search:'Αναζήτηση',
  now:'Σε ισχύ τώρα',chooseDate:'Άλλη ημερομηνία',dutyDate:'Ημερομηνία',hospitalTitle:'Εφημερεύοντα νοσοκομεία',pharmacyTitle:'Εφημερεύοντα φαρμακεία',
@@ -48,7 +48,7 @@ const TEXT={
  },
  en:{
  kicker:'DUTY ROSTERS · GREECE',heading:'Who is <em>on duty</em> near you?',
- summary:'Hospitals by medical specialty and duty pharmacies, with hours, phone numbers and Google Maps. Interactive map included.',
+ summary:'Hospitals and duty pharmacies with published hours, phone numbers and Google Maps directions.',mapDirectionsNote:'Open Google Maps on any listing for its location and directions.',
  emergency:'Serious emergency? Call <a href="tel:112">112</a> or <a href="tel:166">166</a>. Published rosters do not guarantee real-time availability.',
  locationLabel:'SEARCH AREA',confirm:'Use this area',change:'Change area',cityLabel:'City / neighborhood',search:'Search',
  now:'On duty now (scheduled)',chooseDate:'Other date',dutyDate:'Date',hospitalTitle:'Hospitals on duty',pharmacyTitle:'Duty pharmacies',
