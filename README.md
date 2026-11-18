@@ -1,5 +1,9 @@
 # EFIMERIA ONE v4 — Automatic Duty Roster Finder
 
+> **Workspace status:** Active product — EFIMERIA ONE.
+>
+> **Active projects:** [NBA Atlas](https://github.com/mariodinakus/sideline-sports) · [AXON](https://github.com/mariodinakus/axon) · [MONO](https://github.com/mariodinakus/monokairos) · [PAX](https://github.com/mariodinakus/world-faultline/tree/main/pax) · [EFIMERIA ONE](https://github.com/mariodinakus/efimeria-one) · [AOTH](https://github.com/mariodinakus/aoth).
+
 Bilingual (Greek / English), mobile-first, map-free search for **published duty schedules** with Google Maps navigation per result.
 
 ## What's actually automated
