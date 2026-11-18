@@ -12,7 +12,7 @@
     "node": ">=20"
   },
   "dependencies": {
-    "pdfjs-dist": "3.11.174",
+    "pdfjs-dist": "6.5.438",
     "cheerio": "1.0.0",
     "exceljs": "4.4.0"
   }
